@@ -1,0 +1,31 @@
+/local_directory
+
+# Model weight files (too large for GitHub)
+*.pt
+*.pth
+*.joblib
+*.pkl
+
+# Large data files
+*.npy
+*.npz
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE and OS files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Zip files (submissions)
+*.zip
+
+# Data directories
+data/
+eeg_cache/
+scoring_results/
+test_results/
