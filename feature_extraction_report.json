@@ -1,0 +1,26 @@
+{
+  "start_time": "2025-10-09T22:12:02.064659",
+  "end_time": "2025-10-09T22:12:14.294675",
+  "duration_minutes": 0.2038336,
+  "n_samples": 245,
+  "n_features": 2838,
+  "n_participants_processed": 3,
+  "tasks_processed": [
+    "contrastChangeDetection_run-1",
+    "contrastChangeDetection_run-3",
+    "contrastChangeDetection_run-2"
+  ],
+  "feature_categories": {
+    "statistical": false,
+    "spectral": false,
+    "temporal": false,
+    "channel_specific": false,
+    "catch22_like": true,
+    "entropy": false,
+    "connectivity": false
+  },
+  "data_quality": {
+    "nan_values": 1294,
+    "infinite_values": 0
+  }
+}
