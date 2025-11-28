@@ -15,6 +15,7 @@ import seaborn as sns
 from scipy import stats
 from collections import defaultdict
 import pandas as pd
+from datetime import datetime
 
 # Braindecode imports
 from braindecode.models import EEGNetv4, EEGConformer
@@ -46,6 +47,40 @@ SFREQ = 100
 SHIFT_AFTER_STIM = 0.5
 WINDOW_LEN = 2.0
 ANCHOR = "stimulus_anchor"
+
+# Results directory - create timestamped folder
+TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
+RESULTS_DIR = f"experiment_results_{TIMESTAMP}"
+os.makedirs(RESULTS_DIR, exist_ok=True)
+
+# Create a README in the results folder
+with open(os.path.join(RESULTS_DIR, "README.txt"), 'w') as f:
+    f.write("=" * 70 + "\n")
+    f.write("EXPERIMENT RESULTS DIRECTORY\n")
+    f.write("=" * 70 + "\n\n")
+    f.write(f"Created: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+    f.write(f"Directory: {RESULTS_DIR}\n\n")
+    f.write("This directory contains all results from the training experiments.\n\n")
+    f.write("STRUCTURE:\n")
+    f.write("  - <model_name>/          : Individual model directories\n")
+    f.write("    - best_model.pt       : Best model weights\n")
+    f.write("    - best_checkpoint.pt  : Full checkpoint with optimizer state\n")
+    f.write("    - checkpoint_epoch_*.pt: Periodic checkpoints\n")
+    f.write("    - training_history.json: Complete training history\n")
+    f.write("    - training_curves.png : Training/validation curves\n")
+    f.write("    - config.json         : Model configuration\n")
+    f.write("    - final_*.npy        : Final predictions, targets, errors\n")
+    f.write("  - *_best.pt             : Quick access to best models\n")
+    f.write("  - *_error_distribution.png: Error distribution plots\n")
+    f.write("  - *_error_stats.json   : Error statistics\n")
+    f.write("  - *_demographics.png   : Demographic analysis plots\n")
+    f.write("  - *_demographics.json  : Demographic statistics\n")
+    f.write("  - ablation_studies.json: Ablation study framework\n")
+    f.write("  - experiment_summary.json: Complete summary (JSON)\n")
+    f.write("  - EXPERIMENT_SUMMARY.txt: Human-readable summary\n")
+
+print(f"\n📁 All results will be saved to: {RESULTS_DIR}/")
+print("=" * 70)
 
 # Experimental configuration
 RUN_CONTROLLED_EXPERIMENTS = True
@@ -481,16 +516,33 @@ def eval_epoch(model, loader, return_domain=False):
     return total_rmse / steps, total_nrmse / steps, all_preds, all_targets, all_errors
 
 
-def train_model(name, model, train_loader, valid_loader, return_domain=False):
+def train_model(name, model, train_loader, valid_loader, return_domain=False, save_checkpoints=True, checkpoint_interval=5):
     print(f"\n===== Training {name} =====")
     model = model.to(DEVICE)
     optimizer = AdamW(model.parameters(), lr=LR)
 
     best_rmse = float("inf")
-    os.makedirs("results", exist_ok=True)
+    best_epoch = 0
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+    model_dir = os.path.join(RESULTS_DIR, name)
+    os.makedirs(model_dir, exist_ok=True)
     
-    train_history = {'rmse': [], 'loss': []}
-    val_history = {'rmse': [], 'nrmse': [], 'errors': []}
+    train_history = {'rmse': [], 'loss': [], 'epoch': []}
+    val_history = {'rmse': [], 'nrmse': [], 'errors': [], 'epoch': []}
+    
+    # Save model configuration
+    config = {
+        'name': name,
+        'n_chans': n_chans,
+        'n_times': n_times,
+        'epochs': EPOCHS,
+        'batch_size': BATCH_SIZE,
+        'learning_rate': LR,
+        'device': DEVICE,
+        'return_domain': return_domain
+    }
+    with open(os.path.join(model_dir, "config.json"), 'w') as f:
+        json.dump(config, f, indent=2)
 
     for epoch in range(1, EPOCHS + 1):
         print(f"\nEpoch {epoch}/{EPOCHS}")
@@ -505,15 +557,88 @@ def train_model(name, model, train_loader, valid_loader, return_domain=False):
 
         train_history['rmse'].append(tr_rmse)
         train_history['loss'].append(tr_loss)
+        train_history['epoch'].append(epoch)
         val_history['rmse'].append(va_rmse)
         val_history['nrmse'].append(va_nrmse)
-        val_history['errors'].append(va_errors)
+        val_history['errors'].append(va_errors.tolist())  # Convert to list for JSON
+        val_history['epoch'].append(epoch)
+
+        # Save checkpoint periodically
+        if save_checkpoints and epoch % checkpoint_interval == 0:
+            checkpoint = {
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'train_rmse': tr_rmse,
+                'val_rmse': va_rmse,
+                'val_nrmse': va_nrmse,
+            }
+            torch.save(checkpoint, os.path.join(model_dir, f"checkpoint_epoch_{epoch}.pt"))
+            print(f"Saved checkpoint at epoch {epoch}")
 
         # save best
         if va_rmse < best_rmse:
             best_rmse = va_rmse
-            torch.save(model.state_dict(), f"results/{name}_best.pt")
-            print(f"Saved best {name} (RMSE={best_rmse:.4f})")
+            best_epoch = epoch
+            torch.save(model.state_dict(), os.path.join(RESULTS_DIR, f"{name}_best.pt"))
+            torch.save(model.state_dict(), os.path.join(model_dir, "best_model.pt"))
+            # Also save full checkpoint for best model
+            best_checkpoint = {
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'train_rmse': tr_rmse,
+                'val_rmse': va_rmse,
+                'val_nrmse': va_nrmse,
+                'best_rmse': best_rmse,
+            }
+            torch.save(best_checkpoint, os.path.join(model_dir, "best_checkpoint.pt"))
+            print(f"Saved best {name} (RMSE={best_rmse:.4f} at epoch {epoch})")
+
+        # Save training history after each epoch (incremental save)
+        history = {
+            'train_history': train_history,
+            'val_history': val_history,
+            'best_rmse': best_rmse,
+            'best_epoch': best_epoch
+        }
+        with open(os.path.join(model_dir, "training_history.json"), 'w') as f:
+            json.dump(history, f, indent=2)
+        
+        # Save predictions and targets for final epoch
+        if epoch == EPOCHS:
+            np.save(os.path.join(model_dir, "final_train_predictions.npy"), tr_preds)
+            np.save(os.path.join(model_dir, "final_train_targets.npy"), tr_targets)
+            np.save(os.path.join(model_dir, "final_val_predictions.npy"), va_preds)
+            np.save(os.path.join(model_dir, "final_val_targets.npy"), va_targets)
+            np.save(os.path.join(model_dir, "final_val_errors.npy"), va_errors)
+
+    # Save final training curves plot
+    try:
+        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+        
+        epochs = train_history['epoch']
+        axes[0].plot(epochs, train_history['rmse'], label='Train RMSE', marker='o')
+        axes[0].plot(epochs, val_history['rmse'], label='Val RMSE', marker='s')
+        axes[0].axvline(best_epoch, color='r', linestyle='--', label=f'Best (epoch {best_epoch})')
+        axes[0].set_xlabel('Epoch')
+        axes[0].set_ylabel('RMSE')
+        axes[0].set_title(f'{name} - RMSE over Epochs')
+        axes[0].legend()
+        axes[0].grid(True, alpha=0.3)
+        
+        axes[1].plot(epochs, train_history['loss'], label='Train Loss', marker='o')
+        axes[1].set_xlabel('Epoch')
+        axes[1].set_ylabel('Loss')
+        axes[1].set_title(f'{name} - Training Loss')
+        axes[1].legend()
+        axes[1].grid(True, alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(os.path.join(model_dir, "training_curves.png"), dpi=300, bbox_inches='tight')
+        plt.close()
+    except Exception as e:
+        print(f"Warning: Could not save training curves: {e}")
 
     return best_rmse, train_history, val_history
 
@@ -521,7 +646,9 @@ def train_model(name, model, train_loader, valid_loader, return_domain=False):
 # ============================================================
 # 7. ERROR DISTRIBUTION ANALYSIS
 # ============================================================
-def analyze_error_distribution(errors, name, save_dir="results"):
+def analyze_error_distribution(errors, name, save_dir=None):
+    if save_dir is None:
+        save_dir = RESULTS_DIR
     """Analyze and visualize error distributions"""
     os.makedirs(save_dir, exist_ok=True)
     
@@ -584,7 +711,9 @@ def analyze_error_distribution(errors, name, save_dir="results"):
 # ============================================================
 # 8. DEMOGRAPHIC STRATIFICATION
 # ============================================================
-def analyze_demographics(meta_information, predictions, targets, name, dataset, save_dir="results"):
+def analyze_demographics(meta_information, predictions, targets, name, dataset, save_dir=None):
+    if save_dir is None:
+        save_dir = RESULTS_DIR
     """Analyze predictions stratified by demographics"""
     os.makedirs(save_dir, exist_ok=True)
     
@@ -641,31 +770,43 @@ def analyze_demographics(meta_information, predictions, targets, name, dataset, 
     results = {}
     
     # Age stratification
-    if ages is not None:
-        age_bins = [0, 10, 15, 20, 25, 30, 100]
-        age_labels = ['<10', '10-15', '15-20', '20-25', '25-30', '30+']
-        age_groups = pd.cut(ages, bins=age_bins, labels=age_labels)
-        
-        age_results = {}
-        for age_group in age_labels:
-            mask = age_groups == age_group
-            if mask.sum() > 0:
-                group_preds = predictions[mask]
-                group_targets = targets[mask]
-                group_errors = group_preds - group_targets
-                age_results[age_group] = {
-                    'rmse': float(np.sqrt(np.mean(group_errors**2))),
-                    'mae': float(np.mean(np.abs(group_errors))),
-                    'n': int(mask.sum()),
-                    'mean_error': float(np.mean(group_errors))
-                }
-        results['age_stratification'] = age_results
+    if ages is not None and len(ages) > 0:
+        try:
+            # Filter out NaN values
+            valid_age_mask = ~np.isnan(ages)
+            if valid_age_mask.sum() > 0:
+                valid_ages = ages[valid_age_mask]
+                age_bins = [0, 10, 15, 20, 25, 30, 100]
+                age_labels = ['<10', '10-15', '15-20', '20-25', '25-30', '30+']
+                age_groups = pd.cut(valid_ages, bins=age_bins, labels=age_labels)
+                
+                age_results = {}
+                for age_group in age_labels:
+                    mask = (age_groups == age_group).values
+                    if mask.sum() > 0:
+                        # Map back to full predictions array
+                        full_mask = np.zeros(len(predictions), dtype=bool)
+                        full_mask[valid_age_mask] = mask
+                        group_preds = predictions[full_mask]
+                        group_targets = targets[full_mask]
+                        group_errors = group_preds - group_targets
+                        age_results[age_group] = {
+                            'rmse': float(np.sqrt(np.mean(group_errors**2))),
+                            'mae': float(np.mean(np.abs(group_errors))),
+                            'n': int(mask.sum()),
+                            'mean_error': float(np.mean(group_errors))
+                        }
+                if age_results:
+                    results['age_stratification'] = age_results
+        except Exception as e:
+            print(f"Warning: Could not perform age stratification: {e}")
     
     # Sex stratification
-    if sexes is not None:
+    if sexes is not None and len(sexes) > 0:
         sex_results = {}
-        for sex in sexes.unique():
-            if pd.notna(sex):
+        unique_sexes = np.unique(sexes)
+        for sex in unique_sexes:
+            if pd.notna(sex) and sex is not None:
                 mask = sexes == sex
                 if mask.sum() > 0:
                     group_preds = predictions[mask]
@@ -677,7 +818,8 @@ def analyze_demographics(meta_information, predictions, targets, name, dataset, 
                         'n': int(mask.sum()),
                         'mean_error': float(np.mean(group_errors))
                     }
-        results['sex_stratification'] = sex_results
+        if sex_results:
+            results['sex_stratification'] = sex_results
     
     # Save results
     with open(f"{save_dir}/{name}_demographics.json", 'w') as f:
@@ -777,9 +919,9 @@ if RUN_CONTROLLED_EXPERIMENTS:
     if ANALYZE_DEMOGRAPHICS:
         print("\n--- Demographic Stratification Analysis ---")
         # Get final predictions for demographic analysis
-        cnn_model.load_state_dict(torch.load("results/CNN_only_best.pt"))
-        cnn_trans_model.load_state_dict(torch.load("results/CNN_Transformer_best.pt"))
-        dann_model.load_state_dict(torch.load("results/CNN_Transformer_DANN_best.pt"))
+        cnn_model.load_state_dict(torch.load(os.path.join(RESULTS_DIR, "CNN_only_best.pt")))
+        cnn_trans_model.load_state_dict(torch.load(os.path.join(RESULTS_DIR, "CNN_Transformer_best.pt")))
+        dann_model.load_state_dict(torch.load(os.path.join(RESULTS_DIR, "CNN_Transformer_DANN_best.pt")))
         
         # Evaluate on validation set to get predictions
         _, _, cnn_preds, cnn_targets, _ = eval_epoch(cnn_model, valid_loader)
@@ -857,10 +999,10 @@ if RUN_ABLATION_STUDIES:
     }
     
     # Save ablation results
-    with open("results/ablation_studies.json", 'w') as f:
+    with open(os.path.join(RESULTS_DIR, "ablation_studies.json"), 'w') as f:
         json.dump(ablation_results, f, indent=2)
     
-    print("\nAblation studies framework created. See results/ablation_studies.json")
+    print(f"\nAblation studies framework created. See {RESULTS_DIR}/ablation_studies.json")
 
 
 # ============================================================
@@ -869,9 +1011,157 @@ if RUN_ABLATION_STUDIES:
 print("\n" + "=" * 70)
 print("EXPERIMENTS COMPLETE")
 print("=" * 70)
-print("\nResults saved in 'results/' directory:")
+
+# Create comprehensive summary
+summary = {
+    'experiment_info': {
+        'date': datetime.now().isoformat(),
+        'device': DEVICE,
+        'total_releases_loaded': len(all_release_datasets),
+        'total_recordings': total_recordings,
+        'train_samples': len(train_set),
+        'valid_samples': len(valid_set),
+        'test_samples': len(test_set),
+        'n_chans': int(n_chans),
+        'n_times': int(n_times),
+        'epochs': EPOCHS,
+        'batch_size': BATCH_SIZE,
+        'learning_rate': LR,
+    },
+    'data_info': {
+        'epoch_length_s': EPOCH_LEN_S,
+        'sfreq': SFREQ,
+        'shift_after_stim': SHIFT_AFTER_STIM,
+        'window_len': WINDOW_LEN,
+        'available_releases': available_releases,
+    }
+}
+
+# Add experiment results if they were run
+if RUN_CONTROLLED_EXPERIMENTS:
+    summary['experiments'] = {
+        'CNN_only': {
+            'best_rmse': float(cnn_rmse),
+            'best_epoch': int(cnn_train_hist['epoch'][-1]) if cnn_train_hist['epoch'] else None,
+            'final_train_rmse': float(cnn_train_hist['rmse'][-1]) if cnn_train_hist['rmse'] else None,
+            'final_val_rmse': float(cnn_val_hist['rmse'][-1]) if cnn_val_hist['rmse'] else None,
+            'model_path': os.path.join(RESULTS_DIR, 'CNN_only_best.pt'),
+            'checkpoint_path': os.path.join(RESULTS_DIR, 'CNN_only', 'best_checkpoint.pt'),
+            'history_path': os.path.join(RESULTS_DIR, 'CNN_only', 'training_history.json'),
+        },
+        'CNN_Transformer': {
+            'best_rmse': float(cnn_trans_rmse),
+            'best_epoch': int(cnn_trans_train_hist['epoch'][-1]) if cnn_trans_train_hist['epoch'] else None,
+            'final_train_rmse': float(cnn_trans_train_hist['rmse'][-1]) if cnn_trans_train_hist['rmse'] else None,
+            'final_val_rmse': float(cnn_trans_val_hist['rmse'][-1]) if cnn_trans_val_hist['rmse'] else None,
+            'model_path': os.path.join(RESULTS_DIR, 'CNN_Transformer_best.pt'),
+            'checkpoint_path': os.path.join(RESULTS_DIR, 'CNN_Transformer', 'best_checkpoint.pt'),
+            'history_path': os.path.join(RESULTS_DIR, 'CNN_Transformer', 'training_history.json'),
+        },
+        'CNN_Transformer_DANN': {
+            'best_rmse': float(dann_rmse),
+            'best_epoch': int(dann_train_hist['epoch'][-1]) if dann_train_hist['epoch'] else None,
+            'final_train_rmse': float(dann_train_hist['rmse'][-1]) if dann_train_hist['rmse'] else None,
+            'final_val_rmse': float(dann_val_hist['rmse'][-1]) if dann_val_hist['rmse'] else None,
+            'model_path': os.path.join(RESULTS_DIR, 'CNN_Transformer_DANN_best.pt'),
+            'checkpoint_path': os.path.join(RESULTS_DIR, 'CNN_Transformer_DANN', 'best_checkpoint.pt'),
+            'history_path': os.path.join(RESULTS_DIR, 'CNN_Transformer_DANN', 'training_history.json'),
+            'n_domains': int(n_domains),
+        }
+    }
+    
+    # Calculate gains
+    if 'experiments' in summary:
+        cnn_rmse_val = summary['experiments']['CNN_only']['best_rmse']
+        cnn_trans_rmse_val = summary['experiments']['CNN_Transformer']['best_rmse']
+        dann_rmse_val = summary['experiments']['CNN_Transformer_DANN']['best_rmse']
+        
+        summary['gains'] = {
+            'transformer_gain': float(cnn_rmse_val - cnn_trans_rmse_val),
+            'dann_gain': float(cnn_trans_rmse_val - dann_rmse_val),
+            'total_gain': float(cnn_rmse_val - dann_rmse_val),
+            'transformer_improvement_pct': float((cnn_rmse_val - cnn_trans_rmse_val) / cnn_rmse_val * 100),
+            'dann_improvement_pct': float((cnn_trans_rmse_val - dann_rmse_val) / cnn_trans_rmse_val * 100),
+            'total_improvement_pct': float((cnn_rmse_val - dann_rmse_val) / cnn_rmse_val * 100),
+        }
+
+# Add ablation studies info
+if RUN_ABLATION_STUDIES:
+    summary['ablation_studies'] = {
+        'status': 'Framework created',
+        'file': os.path.join(RESULTS_DIR, 'ablation_studies.json')
+    }
+
+# Add results directory to summary
+summary['results_directory'] = RESULTS_DIR
+
+# Save summary
+with open(os.path.join(RESULTS_DIR, "experiment_summary.json"), 'w') as f:
+    json.dump(summary, f, indent=2)
+
+# Create a human-readable summary text file
+with open(os.path.join(RESULTS_DIR, "EXPERIMENT_SUMMARY.txt"), 'w') as f:
+    f.write("=" * 70 + "\n")
+    f.write("EXPERIMENT SUMMARY\n")
+    f.write("=" * 70 + "\n\n")
+    f.write(f"Date: {summary['experiment_info']['date']}\n")
+    f.write(f"Device: {summary['experiment_info']['device']}\n\n")
+    
+    f.write("DATA INFORMATION:\n")
+    f.write(f"  - Releases loaded: {summary['experiment_info']['total_releases_loaded']}\n")
+    f.write(f"  - Total recordings: {summary['experiment_info']['total_recordings']}\n")
+    f.write(f"  - Train samples: {summary['experiment_info']['train_samples']}\n")
+    f.write(f"  - Valid samples: {summary['experiment_info']['valid_samples']}\n")
+    f.write(f"  - Test samples: {summary['experiment_info']['test_samples']}\n")
+    f.write(f"  - Input shape: {summary['experiment_info']['n_chans']} channels x {summary['experiment_info']['n_times']} time points\n\n")
+    
+    if RUN_CONTROLLED_EXPERIMENTS and 'experiments' in summary:
+        f.write("EXPERIMENT RESULTS:\n")
+        for exp_name, exp_data in summary['experiments'].items():
+            f.write(f"\n  {exp_name}:\n")
+            f.write(f"    - Best RMSE: {exp_data['best_rmse']:.4f}\n")
+            f.write(f"    - Best epoch: {exp_data['best_epoch']}\n")
+            f.write(f"    - Final train RMSE: {exp_data['final_train_rmse']:.4f}\n")
+            f.write(f"    - Final val RMSE: {exp_data['final_val_rmse']:.4f}\n")
+            f.write(f"    - Model: {exp_data['model_path']}\n")
+        
+        if 'gains' in summary:
+            f.write("\nGAINS FROM EACH COMPONENT:\n")
+            f.write(f"  - Transformer gain: {summary['gains']['transformer_gain']:.4f} ({summary['gains']['transformer_improvement_pct']:.2f}%)\n")
+            f.write(f"  - DANN gain: {summary['gains']['dann_gain']:.4f} ({summary['gains']['dann_improvement_pct']:.2f}%)\n")
+            f.write(f"  - Total gain: {summary['gains']['total_gain']:.4f} ({summary['gains']['total_improvement_pct']:.2f}%)\n")
+    
+    f.write("\n" + "=" * 70 + "\n")
+    f.write("SAVED FILES:\n")
+    f.write("=" * 70 + "\n")
+    f.write("For each model (CNN_only, CNN_Transformer, CNN_Transformer_DANN):\n")
+    f.write("  - *_best.pt: Best model checkpoint\n")
+    f.write("  - <model_name>/best_model.pt: Best model (copy)\n")
+    f.write("  - <model_name>/best_checkpoint.pt: Full checkpoint with optimizer state\n")
+    f.write("  - <model_name>/checkpoint_epoch_*.pt: Periodic checkpoints (every 5 epochs)\n")
+    f.write("  - <model_name>/training_history.json: Complete training history\n")
+    f.write("  - <model_name>/training_curves.png: Training/validation curves\n")
+    f.write("  - <model_name>/config.json: Model configuration\n")
+    f.write("  - <model_name>/final_*_predictions.npy: Final predictions and targets\n")
+    f.write("  - <model_name>/final_*_errors.npy: Final errors\n")
+    f.write("\nAnalysis files:\n")
+    f.write("  - *_error_distribution.png: Error distribution plots\n")
+    f.write("  - *_error_stats.json: Error statistics\n")
+    f.write("  - *_demographics.png: Demographic analysis plots\n")
+    f.write("  - *_demographics.json: Demographic statistics\n")
+    f.write("  - ablation_studies.json: Ablation study framework\n")
+    f.write("  - experiment_summary.json: Complete experiment summary (JSON)\n")
+    f.write("  - EXPERIMENT_SUMMARY.txt: Human-readable summary\n")
+
+print(f"\n✅ All results saved in '{RESULTS_DIR}/' directory:")
 print("  - Model checkpoints: *_best.pt")
+print("  - Per-model directories with:")
+print("    * Training histories (JSON)")
+print("    * Training curves (PNG)")
+print("    * Periodic checkpoints (every 5 epochs)")
+print("    * Final predictions and targets (NPY)")
 print("  - Error distributions: *_error_distribution.png, *_error_stats.json")
 print("  - Demographic analysis: *_demographics.png, *_demographics.json")
 print("  - Ablation studies: ablation_studies.json")
+print("  - Complete summary: experiment_summary.json, EXPERIMENT_SUMMARY.txt")
 print("=" * 70)
