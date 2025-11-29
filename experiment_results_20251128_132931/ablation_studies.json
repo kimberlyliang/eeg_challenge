@@ -1,0 +1,36 @@
+{
+  "epoch_length": {
+    "note": "Requires re-windowing data. Current epoch length: 2.0s",
+    "tested_values": [
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ]
+  },
+  "frequency_filtering": {
+    "note": "Filtering done in preprocessing. Current: 0.5-50 Hz bandpass",
+    "current": "0.5-50 Hz bandpass"
+  },
+  "channel_dropout": {
+    "tested_values": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.5
+    ],
+    "note": "Can be implemented as data augmentation or model dropout"
+  },
+  "normalization": {
+    "tested_strategies": [
+      "batch_norm",
+      "layer_norm",
+      "instance_norm",
+      "group_norm",
+      "none"
+    ],
+    "note": "Current: batch normalization in EEGNetv4"
+  }
+}

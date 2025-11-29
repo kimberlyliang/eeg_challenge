@@ -1,0 +1,10 @@
+{
+  "name": "CNN_only",
+  "n_chans": 129,
+  "n_times": 200,
+  "epochs": 30,
+  "batch_size": 64,
+  "learning_rate": 0.001,
+  "device": "cuda",
+  "return_domain": false
+}

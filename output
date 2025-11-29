@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/mnt/sauce/littlab/users/kimliang/eeg_challenge/train_models_challenge1.py", line 14, in <module>
+    from braindecode.models import EEGNetv4, EEGConformer
+ModuleNotFoundError: No module named 'braindecode'
