@@ -2,6 +2,7 @@
 
 # Model weight files (too large for GitHub)
 *.pt
+!gnn_model_weights.pt  # Exception: allow this specific model file
 *.pth
 *.joblib
 *.pkl
@@ -26,6 +27,7 @@ __pycache__/
 
 # Data directories
 data/
+data_merged/
 eeg_cache/
 scoring_results/
 test_results/
