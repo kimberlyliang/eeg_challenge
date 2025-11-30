@@ -1,0 +1,158 @@
+======================================================================
+ABLATION STUDIES SUMMARY
+======================================================================
+
+Start time: 2025-11-30 09:22:26
+End time: 2025-11-30 09:22:26
+Device: cuda
+Epochs per experiment: 20
+Results directory: ablation_results_20251129_024357
+
+======================================================================
+EXPERIMENT RESULTS
+======================================================================
+
+BEST CONFIGURATION FROM EACH STUDY:
+----------------------------------------------------------------------
+Learning Rate:
+  Experiment: CNN_only_lr_0.005
+  Val RMSE: 0.3877
+  Test RMSE: 0.3894
+  Best Epoch: 17
+
+Batch Size:
+  Experiment: CNN_only_bs_32
+  Val RMSE: 0.3881
+  Test RMSE: 0.3877
+  Best Epoch: 4
+
+Dropout Rate:
+  Experiment: CNN_Transformer_dropout_0.5
+  Val RMSE: 0.3764
+  Test RMSE: 0.3791
+  Best Epoch: 20
+
+Transformer Layers:
+  Experiment: CNN_Transformer_layers_1
+  Val RMSE: 0.3788
+  Test RMSE: 0.3812
+  Best Epoch: 13
+
+Transformer Heads:
+  Experiment: CNN_Transformer_heads_4
+  Val RMSE: 0.3773
+  Test RMSE: 0.3795
+  Best Epoch: 18
+
+D Model:
+  Experiment: CNN_Transformer_dmodel_32
+  Val RMSE: 0.3802
+  Test RMSE: 0.3820
+  Best Epoch: 13
+
+======================================================================
+OVERALL BEST CONFIGURATION
+======================================================================
+Study: Dropout Rate
+Experiment: CNN_Transformer_dropout_0.5
+Val RMSE: 0.3764
+Test RMSE: 0.3791
+Best Epoch: 20
+
+======================================================================
+LEARNING RATE DETAILED RESULTS
+======================================================================
+Experiment                                    Val RMSE     Test RMSE    Best Epoch  
+----------------------------------------------------------------------
+CNN_only_lr_0.0005                            0.3923       0.3930       11          
+CNN_only_lr_0.001                             0.3924       0.3927       10          
+CNN_only_lr_0.002                             0.3895       0.3915       17          
+CNN_only_lr_0.005                             0.3877       0.3894       17          
+
+Best: CNN_only_lr_0.005 (Val RMSE: 0.3877)
+Worst: CNN_only_lr_0.001 (Val RMSE: 0.3924)
+Improvement: 0.0047 (1.21%)
+
+======================================================================
+BATCH SIZE DETAILED RESULTS
+======================================================================
+Experiment                                    Val RMSE     Test RMSE    Best Epoch  
+----------------------------------------------------------------------
+CNN_only_bs_32                                0.3881       0.3877       4           
+CNN_only_bs_64                                0.3893       0.3910       16          
+CNN_only_bs_128                               0.3967       0.3974       7           
+
+Best: CNN_only_bs_32 (Val RMSE: 0.3881)
+Worst: CNN_only_bs_128 (Val RMSE: 0.3967)
+Improvement: 0.0086 (2.17%)
+
+======================================================================
+DROPOUT RATE DETAILED RESULTS
+======================================================================
+Experiment                                    Val RMSE     Test RMSE    Best Epoch  
+----------------------------------------------------------------------
+CNN_Transformer_dropout_0.0                   0.3775       0.3806       8           
+CNN_Transformer_dropout_0.1                   0.3807       0.3826       12          
+CNN_Transformer_dropout_0.3                   0.3779       0.3789       16          
+CNN_Transformer_dropout_0.5                   0.3764       0.3791       20          
+
+Best: CNN_Transformer_dropout_0.5 (Val RMSE: 0.3764)
+Worst: CNN_Transformer_dropout_0.1 (Val RMSE: 0.3807)
+Improvement: 0.0043 (1.13%)
+
+======================================================================
+TRANSFORMER LAYERS DETAILED RESULTS
+======================================================================
+Experiment                                    Val RMSE     Test RMSE    Best Epoch  
+----------------------------------------------------------------------
+CNN_Transformer_layers_1                      0.3788       0.3812       13          
+CNN_Transformer_layers_2                      0.3800       0.3828       18          
+CNN_Transformer_layers_3                      0.3846       0.3852       19          
+CNN_Transformer_layers_4                      0.3805       0.3820       10          
+
+Best: CNN_Transformer_layers_1 (Val RMSE: 0.3788)
+Worst: CNN_Transformer_layers_3 (Val RMSE: 0.3846)
+Improvement: 0.0058 (1.50%)
+
+======================================================================
+TRANSFORMER HEADS DETAILED RESULTS
+======================================================================
+Experiment                                    Val RMSE     Test RMSE    Best Epoch  
+----------------------------------------------------------------------
+CNN_Transformer_heads_2                       0.3799       0.3839       18          
+CNN_Transformer_heads_4                       0.3773       0.3795       18          
+CNN_Transformer_heads_8                       0.3817       0.3821       15          
+
+Best: CNN_Transformer_heads_4 (Val RMSE: 0.3773)
+Worst: CNN_Transformer_heads_8 (Val RMSE: 0.3817)
+Improvement: 0.0044 (1.15%)
+
+======================================================================
+D MODEL DETAILED RESULTS
+======================================================================
+Experiment                                    Val RMSE     Test RMSE    Best Epoch  
+----------------------------------------------------------------------
+CNN_Transformer_dmodel_32                     0.3802       0.3820       13          
+CNN_Transformer_dmodel_64                     0.3815       0.3836       12          
+CNN_Transformer_dmodel_128                    0.3812       0.3831       15          
+
+Best: CNN_Transformer_dmodel_32 (Val RMSE: 0.3802)
+Worst: CNN_Transformer_dmodel_64 (Val RMSE: 0.3815)
+Improvement: 0.0012 (0.32%)
+
+======================================================================
+SAVED FILES
+======================================================================
+For each experiment:
+  - <experiment_name>/best_model.pt: Best model weights
+  - <experiment_name>/checkpoint_epoch_*.pt: Periodic checkpoints
+  - <experiment_name>/training_history.json: Complete training history
+  - <experiment_name>/training_curves.png: Training/validation curves
+
+Summary files:
+  - ablation_results.json: Complete results (JSON)
+  - ablation_summary.json: Summary with best configurations
+  - ABLATION_SUMMARY.txt: This summary file
+  - ablation_comparison.png: Comparison plots
+  - <study_name>_curves.png: Learning curves for each study
+  - README.txt: Directory structure guide
