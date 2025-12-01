@@ -50,7 +50,7 @@ ANCHOR = "stimulus_anchor"
 PROJECT_ROOT = Path(__file__).resolve().parent
 DATA_DIR = PROJECT_ROOT / "data_merged"
 RELEASE_ID = 1
-RELEASE_DIR = DATA_MERGED_DIR / f"release_{RELEASE_ID}"
+RELEASE_DIR = DATA_DIR / f"release_{RELEASE_ID}"
 
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
 RESULTS_DIR = PROJECT_ROOT / f"gnn_results_{TIMESTAMP}"
