@@ -3,11 +3,13 @@ from pathlib import Path
 from datetime import datetime
 
 import numpy as np
+import pandas as pd
 import torch
 from torch import nn
 from torch.optim import AdamW
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
+import json
 
 import matplotlib.pyplot as plt
 from scipy import stats
@@ -46,11 +48,37 @@ SHIFT_AFTER_STIM = 0.5
 WINDOW_LEN = 2.0
 ANCHOR = "stimulus_anchor"
 
-# This mirrors your Pioneer path layout: data_merged/release_1 under the project root.
+# Data path: Use data/ (same as train_models_challenge1.py which works)
 PROJECT_ROOT = Path(__file__).resolve().parent
 DATA_DIR = PROJECT_ROOT / "data_merged"
-RELEASE_ID = 1
+
+# Find available releases (same logic as train_models_challenge1.py)
+RELEASE_ID = 5  # Default to release 5 like the other script
+available_releases = []
+
+if DATA_DIR.exists():
+    for item in DATA_DIR.iterdir():
+        if item.is_dir() and item.name.startswith("release_"):
+            release_num = item.name.split("_")[1]
+            try:
+                available_releases.append(int(release_num))
+            except ValueError:
+                continue
+
+available_releases.sort()
+print(f"Available releases: {available_releases}")
+
 RELEASE_DIR = DATA_DIR / f"release_{RELEASE_ID}"
+
+if not RELEASE_DIR.exists():
+    if available_releases:
+        RELEASE_ID = available_releases[0]
+        RELEASE_DIR = DATA_DIR / f"release_{RELEASE_ID}"
+        print(f"🔄 Using Release {RELEASE_ID} instead")
+    else:
+        raise FileNotFoundError("No release folders found in data/")
+
+print(f"📁 Using data/release_{RELEASE_ID}")
 
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
 RESULTS_DIR = PROJECT_ROOT / f"gnn_results_{TIMESTAMP}"
@@ -111,13 +139,15 @@ def convert_to_pytorch(edge_index, edge_weights=None):
 # ============================================================
 def load_windows_and_targets():
     print("=" * 70)
-    print("Loading EEG windows and targets (data_merged / release_1)")
+    print(f"Loading EEG windows and targets from release_{RELEASE_ID}")
     print("=" * 70)
 
-    print(f"📁 Loading from: {RELEASE_DIR}")
+    print(f"📁 Loading from: {RELEASE_DIR.resolve()}")
     if not RELEASE_DIR.exists():
         raise FileNotFoundError(f"Release dir not found: {RELEASE_DIR}")
 
+    # EEGChallengeDataset expects cache_dir to point to the release folder
+    # This matches train_models_challenge1.py exactly
     dataset_ccd = EEGChallengeDataset(
         task="contrastChangeDetection",
         release=f"R{RELEASE_ID}",
@@ -125,7 +155,8 @@ def load_windows_and_targets():
         mini=False,
         download=False,
     )
-    print(f"✅ Loaded {len(dataset_ccd.datasets)} recordings")
+    
+    print(f"✅ Loaded {len(dataset_ccd.datasets)} recordings from Release R{RELEASE_ID}")
 
     transformation_offline = [
         Preprocessor(
