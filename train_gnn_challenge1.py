@@ -48,7 +48,7 @@ ANCHOR = "stimulus_anchor"
 
 # This mirrors your Pioneer path layout: data_merged/release_1 under the project root.
 PROJECT_ROOT = Path(__file__).resolve().parent
-DATA_MERGED_DIR = PROJECT_ROOT / "data_merged"
+DATA_DIR = PROJECT_ROOT / "data_merged"
 RELEASE_ID = 1
 RELEASE_DIR = DATA_MERGED_DIR / f"release_{RELEASE_ID}"
 
