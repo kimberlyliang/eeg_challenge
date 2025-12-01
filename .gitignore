@@ -1,13 +1,13 @@
 /local_directory
 
 # Model weight files (too large for GitHub)
-*.pt
+# *.pt
 *.pth
 *.joblib
 *.pkl
 
 # Large data files
-*.npy
+# *.npy
 *.npz
 
 # Python cache
