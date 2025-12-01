@@ -1,0 +1,44 @@
+Running on: cuda
+
+📁 All GNN results will be saved to: /mnt/sauce/littlab/users/kimliang/eeg_challenge/gnn_results_20251201_135814/
+======================================================================
+======================================================================
+Loading EEG windows and targets (data_merged / release_1)
+======================================================================
+📁 Loading from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_merged/release_1
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Traceback (most recent call last):
+  File "/mnt/sauce/littlab/users/kimliang/eeg_challenge/train_gnn_challenge1.py", line 612, in <module>
+    train_gnn()
+  File "/mnt/sauce/littlab/users/kimliang/eeg_challenge/train_gnn_challenge1.py", line 484, in train_gnn
+    single_windows, targets, meta = load_windows_and_targets()
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/sauce/littlab/users/kimliang/eeg_challenge/train_gnn_challenge1.py", line 121, in load_windows_and_targets
+    dataset_ccd = EEGChallengeDataset(
+                  ^^^^^^^^^^^^^^^^^^^^
+  File "/home1/k/kimliang/miniconda3/lib/python3.12/site-packages/eegdash/dataset/dataset.py", line 172, in __init__
+    super().__init__(
+  File "/home1/k/kimliang/miniconda3/lib/python3.12/site-packages/eegdash/api.py", line 867, in __init__
+    super().__init__(datasets)
+  File "/lcars/home/k/kimliang/.local/lib/python3.12/site-packages/braindecode/datasets/base.py", line 443, in __init__
+    super().__init__(list_of_ds)
+  File "/home1/k/kimliang/miniconda3/lib/python3.12/site-packages/torch/utils/data/dataset.py", line 328, in __init__
+    assert len(self.datasets) > 0, "datasets should not be an empty iterable"  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: datasets should not be an empty iterable
