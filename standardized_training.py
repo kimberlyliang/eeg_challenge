@@ -170,6 +170,8 @@ def preprocess_and_window_dataset(dataset, release_id):
         ),
         Preprocessor(add_aux_anchors, apply_on_array=False),
     ]
+    # Use n_jobs=1 and ensure we're not triggering downloads during preprocessing
+    # The dataset should already be loaded with download=False
     preprocess(dataset, transformation_offline, n_jobs=1)
     
     # Keep only recordings with stimulus anchors
