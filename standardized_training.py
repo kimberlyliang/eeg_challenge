@@ -139,7 +139,8 @@ def load_release(release_id, data_dir="data_merged"):
             task="contrastChangeDetection",
             release=f"R{release_id}",
             cache_dir=release_dir,
-            mini=False
+            mini=False,
+            download=False  # Prevent downloading - use only local data
         )
         
         if len(dataset.datasets) > 0:
