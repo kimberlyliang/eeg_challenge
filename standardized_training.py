@@ -121,7 +121,7 @@ print("=" * 70)
 # ============================================================
 # 1. DATA LOADING WITH STANDARDIZED SPLIT
 # ============================================================
-def load_release(release_id, data_dir="data"):
+def load_release(release_id, data_dir="data/merged"):
     """Load a specific release"""
     release_dir = Path(f"{data_dir}/release_{release_id}")
     if not release_dir.exists():
