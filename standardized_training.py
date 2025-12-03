@@ -121,35 +121,33 @@ print("=" * 70)
 # ============================================================
 # 1. DATA LOADING WITH STANDARDIZED SPLIT
 # ============================================================
-def load_release(release_id, data_dir=None):
+def load_release(release_id, data_dir="data_merged"):
     """Load a specific release - tries multiple possible data directory locations"""
-    # Try multiple possible data directory locations
-    if data_dir is None:
-        possible_dirs = [
-            Path(f"data_merged/release_{release_id}"),
-            Path(f"data/release_{release_id}"),
-            Path(f"data/merged/release_{release_id}"),
-            Path(f"data_merged"),
-            Path(f"data"),
-        ]
-    else:
-        possible_dirs = [
-            Path(f"{data_dir}/release_{release_id}"),
-            Path(f"data_merged/release_{release_id}"),
-            Path(f"data/release_{release_id}"),
-        ]
+    # Try multiple possible data directory locations, prioritizing data_merged
+    # if data_dir == "data_merged":
+    #     possible_dirs = [
+    #         Path(f"data_merged/release_{release_id}"),
+    #         Path(f"data/release_{release_id}"),
+    #         Path(f"data/merged/release_{release_id}"),
+    #     ]
+    # else:
+    #     possible_dirs = [
+    #         Path(f"{data_dir}/release_{release_id}"),
+    #         Path(f"data_merged/release_{release_id}"),
+    #         Path(f"data/release_{release_id}"),
+    #     ]
     
     release_dir = None
-    for dir_path in possible_dirs:
-        if dir_path.exists():
-            # If it's a directory that contains release folders, construct the full path
-            if dir_path.name.startswith("release_"):
-                release_dir = dir_path
-            elif (dir_path / f"release_{release_id}").exists():
-                release_dir = dir_path / f"release_{release_id}"
-            else:
-                continue
-            break
+    dir_path = Path(f"{data_dir}/release_{release_id}")
+    if dir_path.exists():
+        # If it's a directory that contains release folders, construct the full path
+        if dir_path.name.startswith("release_"):
+            release_dir = dir_path
+        elif (dir_path / f"release_{release_id}").exists():
+            release_dir = dir_path / f"release_{release_id}"
+        else:
+            continue
+        break
     
     if release_dir is None:
         print(f"⚠️  No data directory found for Release {release_id}. Tried: {[str(d) for d in possible_dirs]}")
