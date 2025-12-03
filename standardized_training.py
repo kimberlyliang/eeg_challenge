@@ -137,20 +137,9 @@ def load_release(release_id, data_dir="data_merged"):
     #         Path(f"data/release_{release_id}"),
     #     ]
     
-    release_dir = None
-    dir_path = Path(f"{data_dir}/release_{release_id}")
-    if dir_path.exists():
-        # If it's a directory that contains release folders, construct the full path
-        if dir_path.name.startswith("release_"):
-            release_dir = dir_path
-        elif (dir_path / f"release_{release_id}").exists():
-            release_dir = dir_path / f"release_{release_id}"
-        else:
-            continue
-        break
-    
-    if release_dir is None:
-        print(f"⚠️  No data directory found for Release {release_id}. Tried: {[str(d) for d in possible_dirs]}")
+    release_dir = Path(f"{data_dir}/release_{release_id}")
+    if not release_dir.exists():
+        print(f"⚠️  No data directory found for Release {release_id}. Tried: {release_dir}")
         return None
     
     try:
