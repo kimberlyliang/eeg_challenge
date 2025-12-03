@@ -121,23 +121,56 @@ print("=" * 70)
 # ============================================================
 # 1. DATA LOADING WITH STANDARDIZED SPLIT
 # ============================================================
-def load_release(release_id, data_dir="data/merged"):
-    """Load a specific release"""
-    release_dir = Path(f"{data_dir}/release_{release_id}")
-    if not release_dir.exists():
+def load_release(release_id, data_dir=None):
+    """Load a specific release - tries multiple possible data directory locations"""
+    # Try multiple possible data directory locations
+    if data_dir is None:
+        possible_dirs = [
+            Path(f"data_merged/release_{release_id}"),
+            Path(f"data/release_{release_id}"),
+            Path(f"data/merged/release_{release_id}"),
+            Path(f"data_merged"),
+            Path(f"data"),
+        ]
+    else:
+        possible_dirs = [
+            Path(f"{data_dir}/release_{release_id}"),
+            Path(f"data_merged/release_{release_id}"),
+            Path(f"data/release_{release_id}"),
+        ]
+    
+    release_dir = None
+    for dir_path in possible_dirs:
+        if dir_path.exists():
+            # If it's a directory that contains release folders, construct the full path
+            if dir_path.name.startswith("release_"):
+                release_dir = dir_path
+            elif (dir_path / f"release_{release_id}").exists():
+                release_dir = dir_path / f"release_{release_id}"
+            else:
+                continue
+            break
+    
+    if release_dir is None:
+        print(f"⚠️  No data directory found for Release {release_id}. Tried: {[str(d) for d in possible_dirs]}")
         return None
     
     try:
         dataset = EEGChallengeDataset(
             task="contrastChangeDetection",
             release=f"R{release_id}",
-            cache_dir=release_dir,
+            cache_dir=str(release_dir),
             mini=False
         )
         if len(dataset.datasets) > 0:
+            print(f"   ✅ Loaded from: {release_dir}")
             return dataset
+        else:
+            print(f"⚠️  Release {release_id} loaded but has no datasets")
     except Exception as e:
-        print(f"⚠️  Failed to load Release {release_id}: {str(e)[:100]}")
+        print(f"⚠️  Failed to load Release {release_id} from {release_dir}: {str(e)[:200]}")
+        import traceback
+        traceback.print_exc()
         return None
     return None
 
