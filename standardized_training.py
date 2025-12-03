@@ -122,44 +122,35 @@ print("=" * 70)
 # 1. DATA LOADING WITH STANDARDIZED SPLIT
 # ============================================================
 def load_release(release_id, data_dir="data_merged"):
-    """Load a specific release - tries multiple possible data directory locations"""
-    # Try multiple possible data directory locations, prioritizing data_merged
-    # if data_dir == "data_merged":
-    #     possible_dirs = [
-    #         Path(f"data_merged/release_{release_id}"),
-    #         Path(f"data/release_{release_id}"),
-    #         Path(f"data/merged/release_{release_id}"),
-    #     ]
-    # else:
-    #     possible_dirs = [
-    #         Path(f"{data_dir}/release_{release_id}"),
-    #         Path(f"data_merged/release_{release_id}"),
-    #         Path(f"data/release_{release_id}"),
-    #     ]
-    
+    """
+    Load data from a specific release folder (same approach as eeg_conformer_reg.py)
+    Uses cache_dir to point to existing data, avoiding unnecessary downloads
+    """
     release_dir = Path(f"{data_dir}/release_{release_id}")
+    
     if not release_dir.exists():
-        print(f"⚠️  No data directory found for Release {release_id}. Tried: {release_dir}")
+        print(f"⚠️  Release {release_id} folder not found: {release_dir}")
         return None
+    
+    print(f"Loading Release R{release_id} from: {release_dir.resolve()}")
     
     try:
         dataset = EEGChallengeDataset(
             task="contrastChangeDetection",
             release=f"R{release_id}",
-            cache_dir=str(release_dir),
+            cache_dir=release_dir,
             mini=False
         )
+        
         if len(dataset.datasets) > 0:
-            print(f"   ✅ Loaded from: {release_dir}")
+            print(f"✅ Loaded {len(dataset.datasets)} recordings from Release R{release_id}")
             return dataset
         else:
             print(f"⚠️  Release {release_id} loaded but has no datasets")
+            return None
     except Exception as e:
-        print(f"⚠️  Failed to load Release {release_id} from {release_dir}: {str(e)[:200]}")
-        import traceback
-        traceback.print_exc()
+        print(f"⚠️  Failed to load Release {release_id}: {str(e)[:200]}")
         return None
-    return None
 
 
 def preprocess_and_window_dataset(dataset, release_id):
