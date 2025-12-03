@@ -1,0 +1,78 @@
+{
+  "experiment_info": {
+    "date": "2025-12-02T19:34:42.680918",
+    "device": "cuda",
+    "total_releases_loaded": 11,
+    "total_recordings": 5390,
+    "train_samples": 93293,
+    "valid_samples": 11261,
+    "test_samples": 11535,
+    "n_chans": 129,
+    "n_times": 200,
+    "epochs": 30,
+    "batch_size": 64,
+    "learning_rate": 0.001
+  },
+  "data_info": {
+    "epoch_length_s": 2.0,
+    "sfreq": 100,
+    "shift_after_stim": 0.5,
+    "window_len": 2.0,
+    "available_releases": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ]
+  },
+  "experiments": {
+    "CNN_only": {
+      "best_rmse": 0.3887610300867395,
+      "best_epoch": 30,
+      "final_train_rmse": 0.39649864736898444,
+      "final_val_rmse": 0.43165116232227196,
+      "model_path": "experiment_results_20251202_122816/CNN_only_best.pt",
+      "checkpoint_path": "experiment_results_20251202_122816/CNN_only/best_checkpoint.pt",
+      "history_path": "experiment_results_20251202_122816/CNN_only/training_history.json"
+    },
+    "CNN_Transformer": {
+      "best_rmse": 0.3778837610205466,
+      "best_epoch": 30,
+      "final_train_rmse": 0.3895383682842935,
+      "final_val_rmse": 0.38631353180178185,
+      "model_path": "experiment_results_20251202_122816/CNN_Transformer_best.pt",
+      "checkpoint_path": "experiment_results_20251202_122816/CNN_Transformer/best_checkpoint.pt",
+      "history_path": "experiment_results_20251202_122816/CNN_Transformer/training_history.json"
+    },
+    "CNN_Transformer_DANN": {
+      "best_rmse": 0.37814428242431447,
+      "best_epoch": 30,
+      "final_train_rmse": 0.3892421306855721,
+      "final_val_rmse": 0.3920460691336881,
+      "model_path": "experiment_results_20251202_122816/CNN_Transformer_DANN_best.pt",
+      "checkpoint_path": "experiment_results_20251202_122816/CNN_Transformer_DANN/best_checkpoint.pt",
+      "history_path": "experiment_results_20251202_122816/CNN_Transformer_DANN/training_history.json",
+      "n_domains": 1964
+    }
+  },
+  "gains": {
+    "transformer_gain": 0.010877269066192907,
+    "dann_gain": -0.00026052140376786603,
+    "total_gain": 0.010616747662425041,
+    "transformer_improvement_pct": 2.797931949034602,
+    "dann_improvement_pct": -0.0689422067421682,
+    "total_improvement_pct": 2.7309186983212426
+  },
+  "ablation_studies": {
+    "status": "Framework created",
+    "file": "experiment_results_20251202_122816/ablation_studies.json"
+  },
+  "results_directory": "experiment_results_20251202_122816"
+}

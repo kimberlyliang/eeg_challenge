@@ -1,0 +1,65 @@
+======================================================================
+EXPERIMENT SUMMARY
+======================================================================
+
+Date: 2025-12-02T19:34:42.680918
+Device: cuda
+
+DATA INFORMATION:
+  - Releases loaded: 11
+  - Total recordings: 5390
+  - Train samples: 93293
+  - Valid samples: 11261
+  - Test samples: 11535
+  - Input shape: 129 channels x 200 time points
+
+EXPERIMENT RESULTS:
+
+  CNN_only:
+    - Best RMSE: 0.3888
+    - Best epoch: 30
+    - Final train RMSE: 0.3965
+    - Final val RMSE: 0.4317
+    - Model: experiment_results_20251202_122816/CNN_only_best.pt
+
+  CNN_Transformer:
+    - Best RMSE: 0.3779
+    - Best epoch: 30
+    - Final train RMSE: 0.3895
+    - Final val RMSE: 0.3863
+    - Model: experiment_results_20251202_122816/CNN_Transformer_best.pt
+
+  CNN_Transformer_DANN:
+    - Best RMSE: 0.3781
+    - Best epoch: 30
+    - Final train RMSE: 0.3892
+    - Final val RMSE: 0.3920
+    - Model: experiment_results_20251202_122816/CNN_Transformer_DANN_best.pt
+
+GAINS FROM EACH COMPONENT:
+  - Transformer gain: 0.0109 (2.80%)
+  - DANN gain: -0.0003 (-0.07%)
+  - Total gain: 0.0106 (2.73%)
+
+======================================================================
+SAVED FILES:
+======================================================================
+For each model (CNN_only, CNN_Transformer, CNN_Transformer_DANN):
+  - *_best.pt: Best model checkpoint
+  - <model_name>/best_model.pt: Best model (copy)
+  - <model_name>/best_checkpoint.pt: Full checkpoint with optimizer state
+  - <model_name>/checkpoint_epoch_*.pt: Periodic checkpoints (every 5 epochs)
+  - <model_name>/training_history.json: Complete training history
+  - <model_name>/training_curves.png: Training/validation curves
+  - <model_name>/config.json: Model configuration
+  - <model_name>/final_*_predictions.npy: Final predictions and targets
+  - <model_name>/final_*_errors.npy: Final errors
+
+Analysis files:
+  - *_error_distribution.png: Error distribution plots
+  - *_error_stats.json: Error statistics
+  - *_demographics.png: Demographic analysis plots
+  - *_demographics.json: Demographic statistics
+  - ablation_studies.json: Ablation study framework
+  - experiment_summary.json: Complete experiment summary (JSON)
+  - EXPERIMENT_SUMMARY.txt: Human-readable summary
