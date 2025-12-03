@@ -346,8 +346,8 @@ print(f"💡 Your notebook is now ready to work with your downloaded data struct
 
 # %%
 #@title ▶️ Install additional required packages for colab
-!pip install braindecode
-!pip install eegdash
+# !pip install braindecode
+# !pip install eegdash
 
 # %%
 # from pathlib import Path
