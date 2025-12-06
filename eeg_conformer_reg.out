@@ -1,0 +1,1944 @@
+nohup: ignoring input
+💾 Model Saving/Loading Ready!
+Use save_model_as_pt() to save as .pt file
+Use load_model_from_pt() to load from .pt file
+📝 Example Usage:
+1. Train your model
+2. Save with: save_model_as_pt(model_conformer, filename='my_model.pt')
+3. Load with: loaded_model = load_model_from_pt('my_model.pt', device)
+4. Use loaded_model for inference
+
+📁 Found existing .pt files:
+   - submission_1/model_weights_challenge_1.pt (0.25 MB)
+CUDA-enabled GPU found. Training should be faster.
+Available releases: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+📁 Loading data from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_5
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded dataset with 745 recordings from Release R5
+🔄 Setting up Transfer Learning with Multiple Releases
+============================================================
+📚 Loading source releases for pre-training: [1, 2, 3, 4, 6, 7, 8, 9, 10, 11]
+Loading Release R1 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_1
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 293 recordings from Release R1
+✅ Added Release R1: 293 recordings
+Loading Release R2 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_2
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 301 recordings from Release R2
+✅ Added Release R2: 301 recordings
+Loading Release R3 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_3
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 388 recordings from Release R3
+✅ Added Release R3: 388 recordings
+Loading Release R4 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_4
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 756 recordings from Release R4
+✅ Added Release R4: 756 recordings
+Loading Release R6 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_6
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 232 recordings from Release R6
+✅ Added Release R6: 232 recordings
+Loading Release R7 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_7
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 529 recordings from Release R7
+✅ Added Release R7: 529 recordings
+Loading Release R8 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_8
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 512 recordings from Release R8
+✅ Added Release R8: 512 recordings
+Loading Release R9 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_9
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 655 recordings from Release R9
+✅ Added Release R9: 655 recordings
+Loading Release R10 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_10
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 212 recordings from Release R10
+✅ Added Release R10: 212 recordings
+Loading Release R11 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_11
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 767 recordings from Release R11
+✅ Added Release R11: 767 recordings
+
+🎯 Loading target release: R5
+Loading Release R5 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_5
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 745 recordings from Release R5
+✅ Target dataset ready: 745 recordings
+
+📊 Transfer Learning Setup Summary:
+Source releases: 10 releases, 4645 recordings
+Target release: R5, 745 recordings
+You can now use source data for pre-training and target data for fine-tuning!
+Testing Data Loading
+========================================
+Main dataset (R5):
+Location: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_5
+Recordings: 745
+   🔬 First recording:
+      - Channels: 129
+      - Duration: 197.0s
+      - Sampling rate: 100.0 Hz
+      - Channel names: ['E1', 'E2', 'E3', 'E4', 'E5']...
+
+🔄 Testing loading different release...
+Loading Release R1 from: /mnt/sauce/littlab/users/kimliang/eeg_challenge/data_new_new/release_1
+╭────────────────────── EEG 2025 Competition Data Notice ──────────────────────╮
+│ This object loads the HBN dataset that has been preprocessed for the EEG     │
+│ Challenge:                                                                   │
+│   * Downsampled from 500Hz to 100Hz                                          │
+│   * Bandpass filtered (0.5-50 Hz)                                            │
+│                                                                              │
+│ For full preprocessing applied for competition details, see:                 │
+│   https://github.com/eeg2025/downsample-datasets                             │
+│                                                                              │
+│ The HBN dataset have some preprocessing applied by the HBN team:             │
+│   * Re-reference (Cz Channel)                                                │
+│                                                                              │
+│ IMPORTANT: The data accessed via `EEGChallengeDataset` is NOT identical to   │
+│ what you get from EEGDashDataset directly.                                   │
+│ If you are participating in the competition, always use                      │
+│ `EEGChallengeDataset` to ensure consistency with the challenge data.         │
+╰──────────────────────── Source: EEGChallengeDataset ─────────────────────────╯
+Loaded 293 recordings from Release R1
+✅ Successfully loaded Release R1: 293 recordings
+
+🎉 Data loading test complete!
+💡 Your notebook is now ready to work with your downloaded data structure!
+[12/05/25 20:42:56] WARNING  Recording                            windows.py:425
+                             /mnt/sauce/littlab/users/kimliang/ee               
+                             g_challenge/data_new_new/release_5/d               
+                             s005509-bdf/sub-NDARVH153RE7/eeg/sub               
+                             -NDARVH153RE7_task-contrastChangeDet               
+                             ection_run-1_eeg.bdf does not                      
+                             contain event 'stimulus_anchor'                    
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+Used Annotations descriptions: [np.str_('stimulus_anchor')]
+/lcars/home/k/kimliang/.local/lib/python3.12/site-packages/braindecode/models/eegconformer.py:227: UserWarning: This model has only been tested on no more than 64 channels. no guarantee to work with more channels.
+  warnings.warn(
+Number of examples in each split in the minirelease
+Train:	12100
+Valid:	2714
+Test:	330
+ATCNet                  AttentionBaseNet        AttnSleep             
+BDTCN                   BIOT                    CTNet                 
+ContraWR                Deep4Net                DeepSleepNet          
+EEGConformer            EEGITNet                EEGInceptionERP       
+EEGInceptionMI          EEGMiner                EEGNeX                
+EEGNet                  EEGSimpleConv           EEGTCNet              
+FBCNet                  FBLightConvNet          FBMSNet               
+IFNet                   Labram                  MSVTNet               
+SCCNet                  SPARCNet                ShallowFBCSPNet       
+SignalJEPA              SignalJEPA_Contextual   SignalJEPA_PostLocal  
+SignalJEPA_PreLocal     SincShallowNet          SleepStagerBlanco2020 
+SleepStagerChambon2018  SyncNet                 TIDNet                
+TSception               USleep                
+==========================================================================================================================================================================
+Layer (type (var_name):depth-idx)                                      Input Shape               Output Shape              Param #                   Kernel Shape
+==========================================================================================================================================================================
+EEGConformer (EEGConformer)                                            [1, 129, 200]             [1, 1]                    --                        --
+├─_PatchEmbedding (patch_embedding): 1-1                               [1, 1, 129, 200]          [1, 7, 40]                --                        --
+│    └─Sequential (shallownet): 2-1                                    [1, 1, 129, 200]          [1, 40, 1, 7]             --                        --
+│    │    └─Conv2d (0): 3-1                                            [1, 1, 129, 200]          [1, 40, 129, 176]         1,040                     [1, 25]
+│    │    └─Conv2d (1): 3-2                                            [1, 40, 129, 176]         [1, 40, 1, 176]           206,440                   [129, 1]
+│    │    └─BatchNorm2d (2): 3-3                                       [1, 40, 1, 176]           [1, 40, 1, 176]           80                        --
+│    │    └─ELU (3): 3-4                                               [1, 40, 1, 176]           [1, 40, 1, 176]           --                        --
+│    │    └─AvgPool2d (4): 3-5                                         [1, 40, 1, 176]           [1, 40, 1, 7]             --                        [1, 75]
+│    │    └─Dropout (5): 3-6                                           [1, 40, 1, 7]             [1, 40, 1, 7]             --                        --
+│    └─Sequential (projection): 2-2                                    [1, 40, 1, 7]             [1, 7, 40]                --                        --
+│    │    └─Conv2d (0): 3-7                                            [1, 40, 1, 7]             [1, 40, 1, 7]             1,640                     [1, 1]
+│    │    └─Rearrange (1): 3-8                                         [1, 40, 1, 7]             [1, 7, 40]                --                        --
+├─_TransformerEncoder (transformer): 1-2                               [1, 7, 40]                [1, 7, 40]                --                        --
+│    └─_TransformerEncoderBlock (0): 2-3                               [1, 7, 40]                [1, 7, 40]                --                        --
+│    │    └─_ResidualAdd (0): 3-9                                      [1, 7, 40]                [1, 7, 40]                6,640                     --
+│    │    └─_ResidualAdd (1): 3-10                                     [1, 7, 40]                [1, 7, 40]                13,080                    --
+│    └─_TransformerEncoderBlock (1): 2-4                               [1, 7, 40]                [1, 7, 40]                --                        --
+│    │    └─_ResidualAdd (0): 3-11                                     [1, 7, 40]                [1, 7, 40]                6,640                     --
+│    │    └─_ResidualAdd (1): 3-12                                     [1, 7, 40]                [1, 7, 40]                13,080                    --
+│    └─_TransformerEncoderBlock (2): 2-5                               [1, 7, 40]                [1, 7, 40]                --                        --
+│    │    └─_ResidualAdd (0): 3-13                                     [1, 7, 40]                [1, 7, 40]                6,640                     --
+│    │    └─_ResidualAdd (1): 3-14                                     [1, 7, 40]                [1, 7, 40]                13,080                    --
+│    └─_TransformerEncoderBlock (3): 2-6                               [1, 7, 40]                [1, 7, 40]                --                        --
+│    │    └─_ResidualAdd (0): 3-15                                     [1, 7, 40]                [1, 7, 40]                6,640                     --
+│    │    └─_ResidualAdd (1): 3-16                                     [1, 7, 40]                [1, 7, 40]                13,080                    --
+│    └─_TransformerEncoderBlock (4): 2-7                               [1, 7, 40]                [1, 7, 40]                --                        --
+│    │    └─_ResidualAdd (0): 3-17                                     [1, 7, 40]                [1, 7, 40]                6,640                     --
+│    │    └─_ResidualAdd (1): 3-18                                     [1, 7, 40]                [1, 7, 40]                13,080                    --
+│    └─_TransformerEncoderBlock (5): 2-8                               [1, 7, 40]                [1, 7, 40]                --                        --
+│    │    └─_ResidualAdd (0): 3-19                                     [1, 7, 40]                [1, 7, 40]                6,640                     --
+│    │    └─_ResidualAdd (1): 3-20                                     [1, 7, 40]                [1, 7, 40]                13,080                    --
+├─_FullyConnected (fc): 1-3                                            [1, 7, 40]                [1, 32]                   --                        --
+│    └─Sequential (fc): 2-9                                            [1, 280]                  [1, 32]                   --                        --
+│    │    └─Linear (0): 3-21                                           [1, 280]                  [1, 256]                  71,936                    --
+│    │    └─ELU (1): 3-22                                              [1, 256]                  [1, 256]                  --                        --
+│    │    └─Dropout (2): 3-23                                          [1, 256]                  [1, 256]                  --                        --
+│    │    └─Linear (3): 3-24                                           [1, 256]                  [1, 32]                   8,224                     --
+│    │    └─ELU (4): 3-25                                              [1, 32]                   [1, 32]                   --                        --
+│    │    └─Dropout (5): 3-26                                          [1, 32]                   [1, 32]                   --                        --
+├─Linear (final_layer): 1-4                                            [1, 32]                   [1, 1]                    33                        --
+==========================================================================================================================================================================
+Total params: 407,713
+Trainable params: 407,713
+Non-trainable params: 0
+Total mult-adds (Units.MEGABYTES): 60.16
+==========================================================================================================================================================================
+Input size (MB): 0.10
+Forward/backward pass size (MB): 7.53
+Params size (MB): 1.63
+Estimated Total Size (MB): 9.26
+==========================================================================================================================================================================
+📁 Saving results t/home1/k/kimliang/miniconda3/lib/python3.12/site-packages/joblib/externaVal RMSE: 0.586718, Val Loss: 0.348956
+
+Val RMSE: 0.523210, Val Loss: 0.266167
+
+Val RMSE: 0.410320, Val Loss: 0.165113
+
+Val RMSE: 0.519860, Val Loss: 0.262809
+
+Val RMSE: 0.410379, Val Loss: 0.167645
+
+Val RMSE: 0.461156, Val Loss: 0.206938
+
+Val RMSE: 0.609371, Val Loss: 0.361796
+
+Val RMSE: 0.438254, Val Loss: 0.192836
+
+Val RMSE: 0.420591, Val Loss: 0.172880
+
+Val RMSE: 0.575323, Val Loss: 0.322166
+
+Val RMSE: 0.407442, Val Loss: 0.163249
+
+Val RMSE: 0.814857, Val Loss: 0.673310
+
+Val RMSE: 0.683105, Val Loss: 0.472907
+
+Val RMSE: 0.876261, Val Loss: 0.777561
+
+Val RMSE: 0.708308, Val Loss: 0.490026
+
+Val RMSE: 0.669751, Val Loss: 0.454480
+
+Val RMSE: 0.608530, Val Loss: 0.375313
+
+Val RMSE: 0.689434, Val Loss: 0.481765
+
+Val RMSE: 0.477156, Val Loss: 0.221407
+
+Val RMSE: 0.629080, Val Loss: 0.401147
+
+Val RMSE: 0.529476, Val Loss: 0.282917
+
+Val RMSE: 0.471613, Val Loss: 0.223136
+
+Val RMSE: 0.408024, Val Loss: 0.165186
+
+Val RMSE: 0.425084, Val Loss: 0.176455
+
+Val RMSE: 0.422758, Val Loss: 0.175657
+
+Val RMSE: 2.290333, Val Loss: 5.207229
+
+Val RMSE: 0.414029, Val Loss: 0.169772
+
+Val RMSE: 0.420293, Val Loss: 0.172953
+
+Val RMSE: 0.422159, Val Loss: 0.174264
+
+Val RMSE: 0.499029, Val Loss: 0.251759
+
+Val RMSE: 0.410554, Val Loss: 0.165749
+
+Val RMSE: 0.605481, Val Loss: 0.370437
+
+Val RMSE: 0.489926, Val Loss: 0.242003
+
+Val RMSE: 1.126809, Val Loss: 1.284242
+
+Val RMSE: 0.472963, Val Loss: 0.225295
+
+Val RMSE: 0.499461, Val Loss: 0.242503
+
+Val RMSE: 1.446656, Val Loss: 2.068197
+
+Val RMSE: 0.528280, Val Loss: 0.281938
+
+Val RMSE: 0.472605, Val Loss: 0.224577
+
+Val RMSE: 0.555327, Val Loss: 0.311885
+
+Val RMSE: 0.416472, Val Loss: 0.171142
+
+Val RMSE: 2.529304, Val Loss: 6.356507
+
+Val RMSE: 0.523176, Val Loss: 0.276028
+
+Val RMSE: 0.458690, Val Loss: 0.210412
+
+Val RMSE: 0.552237, Val Loss: 0.307937
+
+Val RMSE: 0.463012, Val Loss: 0.214299
+
+Val RMSE: 0.418582, Val Loss: 0.172133
+
+Val RMSE: 0.429630, Val Loss: 0.181234
+
+Val RMSE: 0.449156, Val Loss: 0.201838
+
+Val RMSE: 0.415227, Val Loss: 0.169292
+
+Val RMSE: 0.462169, Val Loss: 0.214309
+
+Val RMSE: 0.935673, Val Loss: 0.881862
+
+Val RMSE: 0.428071, Val Loss: 0.179343
+
+Val RMSE: 0.454584, Val Loss: 0.201197
+
+Val RMSE: 0.709732, Val Loss: 0.492010
+
+Val RMSE: 0.425756, Val Loss: 0.180164
+
+Val RMSE: 1.306247, Val Loss: 1.723600
+
+Val RMSE: 0.523487, Val Loss: 0.275735
+
+Val RMSE: 0.421334, Val Loss: 0.173682
+
+Val RMSE: 0.468753, Val Loss: 0.213746
+
+Val RMSE: 0.592534, Val Loss: 0.354583
+
+Val RMSE: 0.869646, Val Loss: 0.765657
+
+Val RMSE: 0.438452, Val Loss: 0.187556
+
+Val RMSE: 1.367175, Val Loss: 1.845197
+
+Val RMSE: 0.429457, Val Loss: 0.180329
+
+Val RMSE: 0.617802, Val Loss: 0.386797
+
+Val RMSE: 3.511555, Val Loss: 12.272681
+
+Val RMSE: 0.720307, Val Loss: 0.506394
+
+Val RMSE: 0.444902, Val Loss: 0.193284
+
+Val RMSE: 0.426508, Val Loss: 0.180739
+
+Val RMSE: 0.735698, Val Loss: 0.548243
+
+Val RMSE: 0.428706, Val Loss: 0.182282
+
+Val RMSE: 0.467669, Val Loss: 0.217149
+
+Val RMSE: 0.456280, Val Loss: 0.208785
+
+Val RMSE: 0.424604, Val Loss: 0.177530
+
+Val RMSE: 0.616204, Val Loss: 0.383105
+
+Val RMSE: 1.387346, Val Loss: 1.942981
+
+Val RMSE: 1.088386, Val Loss: 1.197879
+
+Val RMSE: 0.478497, Val Loss: 0.229161
+
+Val RMSE: 0.785164, Val Loss: 0.624350
+
+Val RMSE: 1.061538, Val Loss: 1.139474
+
+Val RMSE: 1.477778, Val Loss: 2.204099
+
+Val RMSE: 0.782219, Val Loss: 0.620153
+
+Val RMSE: 0.420265, Val Loss: 0.174061
+
+Val RMSE: 0.451423, Val Loss: 0.204643
+
+Val RMSE: 0.457590, Val Loss: 0.209116
+
+Val RMSE: 0.416710, Val Loss: 0.172325
+
+Val RMSE: 0.628409, Val Loss: 0.399314
+
+Val RMSE: 0.447444, Val Loss: 0.195748
+
+Val RMSE: 0.957070, Val Loss: 0.926427
+
+Val RMSE: 0.699741, Val Loss: 0.495161
+
+Val RMSE: 0.438920, Val Loss: 0.189414
+
+Val RMSE: 1.070000, Val Loss: 1.125777
+
+Val RMSE: 0.453145, Val Loss: 0.200265
+
+Val RMSE: 0.512712, Val Loss: 0.263957
+
+Val RMSE: 0.482486, Val Loss: 0.233647
+
+Val RMSE: 0.494561, Val Loss: 0.245259
+
+Val RMSE: 0.415054, Val Loss: 0.169471
+
+Val RMSE: 0.479027, Val Loss: 0.228366
+
+Val RMSE: 0.456903, Val Loss: 0.205444
+
+Val RMSE: 2.963725, Val Loss: 8.829314
+
+Val RMSE: 0.732155, Val Loss: 0.543386
+
+Val RMSE: 0.653786, Val Loss: 0.432681
+
+Val RMSE: 0.650606, Val Loss: 0.429217
+
+Val RMSE: 0.571369, Val Loss: 0.330592
+
+Val RMSE: 0.503155, Val Loss: 0.255531
+
+Val RMSE: 0.439191, Val Loss: 0.188041
+
+Val RMSE: 0.477460, Val Loss: 0.229588
+
+Val RMSE: 0.414212, Val Loss: 0.170714
+
+Val RMSE: 1.065499, Val Loss: 1.148968
+
+Val RMSE: 0.586543, Val Loss: 0.348541
+
+Val RMSE: 1.936890, Val Loss: 3.716529
+
+Val RMSE: 0.845288, Val Loss: 0.724203
+
+Val RMSE: 1.055525, Val Loss: 1.127721
+
+Val RMSE: 0.411563, Val Loss: 0.166469
+
+Val RMSE: 0.578452, Val Loss: 0.338626
+
+Val RMSE: 0.462903, Val Loss: 0.208497
+
+Val RMSE: 1.001047, Val Loss: 1.014549
+
+Val RMSE: 1.834835, Val Loss: 3.392863
+
+Val RMSE: 0.428448, Val Loss: 0.182673
+
+Val RMSE: 0.776070, Val Loss: 0.589017
+
+Val RMSE: 0.622661, Val Loss: 0.392237
+
+Val RMSE: 0.420399, Val Loss: 0.174773
+
+Val RMSE: 0.420439, Val Loss: 0.174944
+
+Val RMSE: 0.425206, Val Loss: 0.177475
+
+Val RMSE: 0.510009, Val Loss: 0.263027
+
+Val RMSE: 0.563436, Val Loss: 0.308793
+
+Val RMSE: 0.428795, Val Loss: 0.179567
+
+Val RMSE: 0.444232, Val Loss: 0.196092
+
+Val RMSE: 0.433720, Val Loss: 0.187795
+
+Val RMSE: 0.478350, Val Loss: 0.230638
+
+Val RMSE: 0.437225, Val Loss: 0.191218
+
+Val RMSE: 0.476575, Val Loss: 0.220878
+
+Val RMSE: 0.540206, Val Loss: 0.294327
+
+Val RMSE: 0.433764, Val Loss: 0.185603
+
+Val RMSE: 0.473715, Val Loss: 0.223974
+
+Val RMSE: 0.887389, Val Loss: 0.772147
+
+Val RMSE: 0.415675, Val Loss: 0.170749
+
+Val RMSE: 0.423857, Val Loss: 0.177327
+
+Val RMSE: 0.435150, Val Loss: 0.184832
+
+Val RMSE: 0.578828, Val Loss: 0.339324
+
+Val RMSE: 0.505967, Val Loss: 0.248832
+
+Val RMSE: 0.595166, Val Loss: 0.344542
+
+Val RMSE: 0.437152, Val Loss: 0.190839
+
+Val RMSE: 0.439708, Val Loss: 0.190882
+
+Val RMSE: 3.489701, Val Loss: 12.124720
+
+Val RMSE: 0.459652, Val Loss: 0.205947
+
+Val RMSE: 0.437267, Val Loss: 0.190253
+
+Val RMSE: 0.455908, Val Loss: 0.203754
+
+Val RMSE: 0.476248, Val Loss: 0.222209
+
+Val RMSE: 0.723550, Val Loss: 0.531020
+
+Val RMSE: 0.565521, Val Loss: 0.319127
+
+Val RMSE: 0.415333, Val Loss: 0.170636
+
+Val RMSE: 0.461757, Val Loss: 0.214758
+
+Val RMSE: 0.731222, Val Loss: 0.522579
+
+Val RMSE: 0.418750, Val Loss: 0.175169
+
+Val RMSE: 0.413045, Val Loss: 0.167746
+
+Val RMSE: 0.416097, Val Loss: 0.169431
+
+Val RMSE: 0.480116, Val Loss: 0.224168
+
+Val RMSE: 0.595449, Val Loss: 0.359488
+
+Val RMSE: 0.445261, Val Loss: 0.193406
+
+Val RMSE: 0.432833, Val Loss: 0.186137
+
+Val RMSE: 1.216320, Val Loss: 1.458581
+
+Val RMSE: 0.444896, Val Loss: 0.198393
+
+Val RMSE: 0.424367, Val Loss: 0.179135
+
+Val RMSE: 0.646232, Val Loss: 0.406835
+
+Val RMSE: 0.905846, Val Loss: 0.804808
+
+Val RMSE: 1.535752, Val Loss: 2.331811
+
+Val RMSE: 0.680125, Val Loss: 0.451279
+
+Val RMSE: 0.424712, Val Loss: 0.179517
+
+Val RMSE: 0.472236, Val Loss: 0.217199
+
+Val RMSE: 0.452877, Val Loss: 0.199693
+
+Val RMSE: 0.413411, Val Loss: 0.168059
+
+Val RMSE: 0.431438, Val Loss: 0.185954
+
+Val RMSE: 0.415596, Val Loss: 0.170563
+
+Val RMSE: 0.612883, Val Loss: 0.380275
+
+Val RMSE: 0.457901, Val Loss: 0.204237
+
+Val RMSE: 0.435058, Val Loss: 0.186258
+
+Val RMSE: 0.447457, Val Loss: 0.195089
+
+Val RMSE: 0.496930, Val Loss: 0.240067
+
+Val RMSE: 0.665071, Val Loss: 0.431544
+
+Val RMSE: 0.993431, Val Loss: 0.998734
+
+Val RMSE: 0.439352, Val Loss: 0.192224
+
+Val RMSE: 0.423491, Val Loss: 0.178626
+
+Val RMSE: 0.426741, Val Loss: 0.178400
+
+Val RMSE: 0.663197, Val Loss: 0.445544
+
+Val RMSE: 0.467917, Val Loss: 0.220634
+
+Val RMSE: 0.410715, Val Loss: 0.165390
+
+Val RMSE: 0.600151, Val Loss: 0.350843
+
+Val RMSE: 0.418286, Val Loss: 0.174523
+
+Val RMSE: 0.436156, Val Loss: 0.185506
+
+Val RMSE: 0.625132, Val Loss: 0.380939
+
+Val RMSE: 0.573775, Val Loss: 0.320499
+
+Val RMSE: 0.459527, Val Loss: 0.212648
+
+Val RMSE: 0.475014, Val Loss: 0.219460
+
+Val RMSE: 0.412805, Val Loss: 0.169682
+
+Val RMSE: 0.404300, Val Loss: 0.161202
+
+Val RMSE: 0.418854, Val Loss: 0.174965
+
+Val RMSE: 0.423682, Val Loss: 0.179175
+
+Val RMSE: 0.405317, Val Loss: 0.161634
+
+Val RMSE: 0.407564, Val Loss: 0.163029
+
+Val RMSE: 0.426570, Val Loss: 0.182247
+
+Val RMSE: 0.404301, Val Loss: 0.160804
+
+Val RMSE: 0.404357, Val Loss: 0.162104
+
+Val RMSE: 0.402858, Val Loss: 0.159990
+
+Val RMSE: 0.404360, Val Loss: 0.160841
+
+Val RMSE: 0.402659, Val Loss: 0.159927
+
+Val RMSE: 0.403037, Val Loss: 0.160070
+
+Val RMSE: 0.402861, Val Loss: 0.160537
+
+Val RMSE: 0.402521, Val Loss: 0.160015
+
+Val RMSE: 0.402847, Val Loss: 0.160519
+
+Val RMSE: 0.402982, Val Loss: 0.160679
+
+Val RMSE: 0.402628, Val Loss: 0.160231
+
+Val RMSE: 0.402765, Val Loss: 0.160418
+
+Val RMSE: 0.402939, Val Loss: 0.160629
+
+Val RMSE: 0.402781, Val Loss: 0.160437
+
+Val RMSE: 0.402783, Val Loss: 0.160441
+
+Val RMSE: 0.403042, Val Loss: 0.160747
+
+Val RMSE: 0.402801, Val Loss: 0.160463
+
+Val RMSE: 0.403004, Val Loss: 0.160703
+
+Val RMSE: 0.402866, Val Loss: 0.160542
+
+Val RMSE: 0.402965, Val Loss: 0.160659
+
+Val RMSE: 0.402921, Val Loss: 0.160608
+
+Val RMSE: 0.402924, Val Loss: 0.160612
+
+Val RMSE: 0.402924, Val Loss: 0.160612
+
+Val RMSE: 0.407474, Val Loss: 0.165042
+
+Val RMSE: 0.405985, Val Loss: 0.161922
+
+Val RMSE: 0.405669, Val Loss: 0.161706
+
+Val RMSE: 0.403156, Val Loss: 0.160130
+
+Val RMSE: 0.402581, Val Loss: 0.160155
+
+Val RMSE: 0.402645, Val Loss: 0.160255
+
+Val RMSE: 0.402695, Val Loss: 0.160326
+
+Val RMSE: 0.402529, Val Loss: 0.160042
+
+Val RMSE: 0.402574, Val Loss: 0.160143
+
+Val RMSE: 0.402526, Val Loss: 0.160034
+
+Val RMSE: 0.402755, Val Loss: 0.160405
+
+Val RMSE: 0.402544, Val Loss: 0.160082
+
+Val RMSE: 0.402983, Val Loss: 0.160680
+
+Val RMSE: 0.402559, Val Loss: 0.160114
+
+Val RMSE: 0.402520, Val Loss: 0.160005
+
+Val RMSE: 0.402811, Val Loss: 0.160476
+
+Val RMSE: 0.402541, Val Loss: 0.160075
+
+Val RMSE: 0.402687, Val Loss: 0.160315
+
+Val RMSE: 0.402636, Val Loss: 0.160242
+
+Val RMSE: 0.402738, Val Loss: 0.160383
+
+Val RMSE: 0.402720, Val Loss: 0.160359
+
+Val RMSE: 0.402681, Val Loss: 0.160306
+
+Val RMSE: 0.402678, Val Loss: 0.160302
+
+Val RMSE: 0.402683, Val Loss: 0.160309
+
+Val RMSE: 0.402683, Val Loss: 0.160309
+
+Val RMSE: 0.403326, Val Loss: 0.161058
+
+Val RMSE: 0.406405, Val Loss: 0.162212
+
+Val RMSE: 0.405314, Val Loss: 0.161467
+
+Val RMSE: 0.402638, Val Loss: 0.159924
+
+Val RMSE: 0.402635, Val Loss: 0.160240
+
+Val RMSE: 0.402522, Val Loss: 0.160019
+
+Val RMSE: 0.402551, Val Loss: 0.160099
+
+Val RMSE: 0.402612, Val Loss: 0.159921
+
+Val RMSE: 0.402521, Val Loss: 0.160010
+
+Val RMSE: 0.402593, Val Loss: 0.160174
+
+Val RMSE: 0.402976, Val Loss: 0.160042
+
+Val RMSE: 0.402733, Val Loss: 0.159945
+
+Val RMSE: 0.403590, Val Loss: 0.160369
+
+Val RMSE: 0.402578, Val Loss: 0.159923
+
+Val RMSE: 0.402538, Val Loss: 0.160068
+
+Val RMSE: 0.402541, Val Loss: 0.159937
+
+Val RMSE: 0.402523, Val Loss: 0.159961
+
+Val RMSE: 0.402636, Val Loss: 0.159923
+
+Val RMSE: 0.402569, Val Loss: 0.159925
+
+Val RMSE: 0.402561, Val Loss: 0.159927
+
+Val RMSE: 0.402580, Val Loss: 0.159922
+
+Val RMSE: 0.402562, Val Loss: 0.159926
+
+Val RMSE: 0.402565, Val Loss: 0.159925
+
+Val RMSE: 0.402568, Val Loss: 0.159925
+
+Val RMSE: 0.402568, Val Loss: 0.159925
+
+Val RMSE: 0.402527, Val Loss: 0.160037
+
+Val RMSE: 0.426317, Val Loss: 0.177407
+
+Val RMSE: 0.414577, Val Loss: 0.168212
+
+Val RMSE: 0.404257, Val Loss: 0.160776
+
+Val RMSE: 0.405235, Val Loss: 0.161413
+
+Val RMSE: 0.403807, Val Loss: 0.160498
+
+Val RMSE: 0.403770, Val Loss: 0.160476
+
+Val RMSE: 0.403336, Val Loss: 0.160226
+
+Val RMSE: 0.404335, Val Loss: 0.160825
+
+Val RMSE: 0.403132, Val Loss: 0.160118
+
+Val RMSE: 0.404506, Val Loss: 0.160935
+
+Val RMSE: 0.404356, Val Loss: 0.160839
+
+Val RMSE: 0.404106, Val Loss: 0.160681
+
+Val RMSE: 0.403817, Val Loss: 0.160504
+
+Val RMSE: 0.404090, Val Loss: 0.160672
+
+Val RMSE: 0.403839, Val Loss: 0.160517
+
+Val RMSE: 0.404360, Val Loss: 0.160841
+
+Val RMSE: 0.403700, Val Loss: 0.160434
+
+Val RMSE: 0.403484, Val Loss: 0.160308
+
+Val RMSE: 0.403632, Val Loss: 0.160394
+
+Val RMSE: 0.403575, Val Loss: 0.160361
+
+Val RMSE: 0.403604, Val Loss: 0.160377
+
+Val RMSE: 0.403623, Val Loss: 0.160389
+
+Val RMSE: 0.403622, Val Loss: 0.160388
+
+Val RMSE: 0.403622, Val Loss: 0.160388
+
+Val RMSE: 0.455999, Val Loss: 0.202384
+
+Val RMSE: 0.430715, Val Loss: 0.180966
+
+Val RMSE: 0.410774, Val Loss: 0.165357
+
+Val RMSE: 0.408193, Val Loss: 0.163475
+
+Val RMSE: 0.408788, Val Loss: 0.163904
+
+Val RMSE: 0.407362, Val Loss: 0.162883
+
+Val RMSE: 0.411465, Val Loss: 0.165870
+
+Val RMSE: 0.411520, Val Loss: 0.165911
+
+Val RMSE: 0.410119, Val Loss: 0.164875
+
+Val RMSE: 0.409527, Val Loss: 0.164441
+
+Val RMSE: 0.406808, Val Loss: 0.162493
+
+Val RMSE: 0.408629, Val Loss: 0.163789
+
+Val RMSE: 0.407514, Val Loss: 0.162990
+
+Val RMSE: 0.407004, Val Loss: 0.162630
+
+Val RMSE: 0.406711, Val Loss: 0.162425
+
+Val RMSE: 0.407050, Val Loss: 0.162662
+
+Val RMSE: 0.407367, Val Loss: 0.162886
+
+Val RMSE: 0.407462, Val Loss: 0.162953
+
+Val RMSE: 0.407502, Val Loss: 0.162982
+
+Val RMSE: 0.407295, Val Loss: 0.162835
+
+Val RMSE: 0.407195, Val Loss: 0.162765
+
+Val RMSE: 0.407122, Val Loss: 0.162713
+
+Val RMSE: 0.407060, Val Loss: 0.162670
+
+Val RMSE: 0.407041, Val Loss: 0.162656
+
+Val RMSE: 0.407041, Val Loss: 0.162656
+
+Val RMSE: 0.464412, Val Loss: 0.209843
+
+Val RMSE: 0.420315, Val Loss: 0.172645
+
+Val RMSE: 0.421327, Val Loss: 0.173440
+
+Val RMSE: 0.416025, Val Loss: 0.169318
+
+Val RMSE: 0.418590, Val Loss: 0.171299
+
+Val RMSE: 0.415345, Val Loss: 0.168797
+
+Val RMSE: 0.415208, Val Loss: 0.168693
+
+Val RMSE: 0.411624, Val Loss: 0.165988
+
+Val RMSE: 0.414962, Val Loss: 0.168505
+
+Val RMSE: 0.414139, Val Loss: 0.167879
+
+Val RMSE: 0.415609, Val Loss: 0.168999
+
+Val RMSE: 0.413537, Val Loss: 0.167423
+
+Val RMSE: 0.413000, Val Loss: 0.167018
+
+Val RMSE: 0.408870, Val Loss: 0.163963
+
+Val RMSE: 0.404482, Val Loss: 0.160920
+
+Val RMSE: 0.403153, Val Loss: 0.160128
+
+Val RMSE: 0.402763, Val Loss: 0.159955
+
+Val RMSE: 0.402625, Val Loss: 0.159922
+
+Val RMSE: 0.402579, Val Loss: 0.159923
+
+Val RMSE: 0.402554, Val Loss: 0.159930
+
+Val RMSE: 0.402544, Val Loss: 0.159935
+
+Val RMSE: 0.402539, Val Loss: 0.159939
+
+Val RMSE: 0.402537, Val Loss: 0.159940
+
+Val RMSE: 0.402536, Val Loss: 0.159941
+
+Val RMSE: 0.402536, Val Loss: 0.159941
+
+Val RMSE: 0.465282, Val Loss: 0.210623
+
+Val RMSE: 0.466510, Val Loss: 0.211728
+
+Val RMSE: 0.424708, Val Loss: 0.176120
+
+Val RMSE: 0.424149, Val Loss: 0.175674
+
+Val RMSE: 0.425943, Val Loss: 0.177108
+
+Val RMSE: 0.423499, Val Loss: 0.175157
+
+Val RMSE: 0.426173, Val Loss: 0.177292
+
+Val RMSE: 0.427005, Val Loss: 0.177960
+
+Val RMSE: 0.420622, Val Loss: 0.172886
+
+Val RMSE: 0.425595, Val Loss: 0.176829
+
+Val RMSE: 0.424696, Val Loss: 0.176110
+
+Val RMSE: 0.424442, Val Loss: 0.175907
+
+Val RMSE: 0.423478, Val Loss: 0.175141
+
+Val RMSE: 0.421645, Val Loss: 0.173690
+
+Val RMSE: 0.421100, Val Loss: 0.173261
+
+Val RMSE: 0.418565, Val Loss: 0.171280
+
+Val RMSE: 0.416802, Val Loss: 0.169915
+
+Val RMSE: 0.415900, Val Loss: 0.169222
+
+Val RMSE: 0.415196, Val Loss: 0.168683
+
+Val RMSE: 0.414712, Val Loss: 0.168315
+
+Val RMSE: 0.414314, Val Loss: 0.168012
+
+Val RMSE: 0.413988, Val Loss: 0.167765
+
+Val RMSE: 0.413822, Val Loss: 0.167638
+
+Val RMSE: 0.413779, Val Loss: 0.167606
+
+Val RMSE: 0.413779, Val Loss: 0.167606
+
+Val RMSE: 0.547844, Val Loss: 0.291999
+
+Val RMSE: 0.472398, Val Loss: 0.217068
+
+Val RMSE: 0.440651, Val Loss: 0.189197
+
+Val RMSE: 0.435663, Val Loss: 0.185033
+
+Val RMSE: 0.439561, Val Loss: 0.188282
+
+Val RMSE: 0.431133, Val Loss: 0.181307
+
+Val RMSE: 0.426616, Val Loss: 0.177648
+
+Val RMSE: 0.432813, Val Loss: 0.182683
+
+Val RMSE: 0.433935, Val Loss: 0.183605
+
+Val RMSE: 0.433063, Val Loss: 0.182888
+
+Val RMSE: 0.427530, Val Loss: 0.178384
+
+Val RMSE: 0.430813, Val Loss: 0.181046
+
+Val RMSE: 0.430257, Val Loss: 0.180593
+
+Val RMSE: 0.428523, Val Loss: 0.179186
+
+Val RMSE: 0.428762, Val Loss: 0.179379
+
+Val RMSE: 0.431127, Val Loss: 0.181303
+
+Val RMSE: 0.432707, Val Loss: 0.182596
+
+Val RMSE: 0.433483, Val Loss: 0.183233
+
+Val RMSE: 0.432950, Val Loss: 0.182795
+
+Val RMSE: 0.432000, Val Loss: 0.182016
+
+Val RMSE: 0.431710, Val Loss: 0.181779
+
+Val RMSE: 0.431467, Val Loss: 0.181580
+
+Val RMSE: 0.431360, Val Loss: 0.181493
+
+Val RMSE: 0.431332, Val Loss: 0.181470
+
+Val RMSE: 0.431332, Val Loss: 0.181470
+
+✅ Saved plot to: eegconformer_results/regularization_sweep_20251205_204301.png
+✅ Saved results to: eegconformer_results/regularization_results_20251205_204301.txt
+
+Ridge:
+     0.001: train=0.397845, val=0.407442
+     0.003: train=0.397080, val=0.410554
+      0.01: train=0.411866, val=0.421334
+      0.02: train=0.394563, val=0.415054
+      0.04: train=0.398098, val=0.411563
+      0.06: train=0.391594, val=0.415675
+      0.08: train=0.396818, val=0.413045
+       0.1: train=0.392493, val=0.404300
+
+Lasso:
+     0.001: train=0.393954, val=0.402659
+     0.003: train=0.392892, val=0.402520
+      0.01: train=0.393747, val=0.402612
+      0.02: train=0.392770, val=0.402527
+      0.04: train=0.401822, val=0.406711
+      0.06: train=0.393807, val=0.402625
+      0.08: train=0.411844, val=0.413779
+       0.1: train=0.428079, val=0.426616
