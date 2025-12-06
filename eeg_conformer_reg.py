@@ -215,7 +215,7 @@ print(f"Available releases: {available_releases}")
 
 # Use release 5 (like original) or choose a different one
 RELEASE_ID = 5  # Change this to use a different release
-RELEASE_DIR = Path(f"data/release_{RELEASE_ID}")
+RELEASE_DIR = Path(f"data_new_new/release_{RELEASE_ID}")
 
 if not RELEASE_DIR.exists():
     # print(f"❌ Release {RELEASE_ID} folder not found: {RELEASE_DIR}")
@@ -223,10 +223,10 @@ if not RELEASE_DIR.exists():
     # Use the first available release if R5 doesn't exist
     if available_releases:
         RELEASE_ID = available_releases[0]
-        RELEASE_DIR = Path(f"data/release_{RELEASE_ID}")
+        RELEASE_DIR = Path(f"data_new_new/release_{RELEASE_ID}")
         print(f"🔄 Using Release {RELEASE_ID} instead")
     else:
-        raise FileNotFoundError("No release folders found in data/")
+        raise FileNotFoundError("No release folders found in data_new_new/")
 
 print(f"📁 Loading data from: {RELEASE_DIR.resolve()}")
 
@@ -252,7 +252,7 @@ def load_release_data(release_id, task="contrastChangeDetection", mini=False):
     Returns:
         EEGChallengeDataset: Loaded dataset
     """
-    release_dir = Path(f"data/release_{release_id}")
+    release_dir = Path(f"data_new_new/release_{release_id}")
     
     if not release_dir.exists():
         raise FileNotFoundError(f"Release {release_id} folder not found: {release_dir}")
@@ -352,7 +352,7 @@ print(f"💡 Your notebook is now ready to work with your downloaded data struct
 # %%
 # from pathlib import Path
 
-# DATA_DIR = Path("data")
+# DATA_DIR = Path("data_new_new")
 # DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # from eegdash.dataset import EEGChallengeDataset
