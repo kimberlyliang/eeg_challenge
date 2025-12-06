@@ -201,7 +201,7 @@ def train_one_epoch(
 # %%
 from pathlib import Path
 
-data_dir = Path("data/merged")
+data_dir = Path("data_new_new")
 available_releases = []
 
 if data_dir.exists():
@@ -839,6 +839,12 @@ def valid_model(
 
 # %%
 
+# Create output directory for plots and results
+output_dir = Path("eegconformer_results")
+output_dir.mkdir(exist_ok=True)
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+print(f"📁 Saving results to: {output_dir.resolve()}")
+
 lambdas = [1e-3, 3e-3, 1e-2, 2e-2, 4e-2, 6e-2, 8e-2, 1e-1]
 
 # Ridge (L2)
@@ -881,9 +887,36 @@ plt.legend()
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()
+
+# Save the plot to output folder
+plot_filename = output_dir / f"regularization_sweep_{timestamp}.png"
+plt.savefig(plot_filename, dpi=300, bbox_inches='tight')
+print(f"✅ Saved plot to: {plot_filename}")
+
 plt.show()
 
-print("Ridge:")
+# Save results to text file
+results_filename = output_dir / f"regularization_results_{timestamp}.txt"
+with open(results_filename, 'w') as f:
+    f.write("EEGConformer Regularization Sweep Results\n")
+    f.write("=" * 60 + "\n\n")
+    f.write("Ridge (L2):\n")
+    f.write("-" * 60 + "\n")
+    f.write(f"{'Lambda':<12} {'Train RMSE':<15} {'Val RMSE':<15}\n")
+    f.write("-" * 60 + "\n")
+    for lam, tr, va in zip(lambdas, ridge_train, ridge_val):
+        f.write(f"{lam:<12.6f} {tr:<15.6f} {va:<15.6f}\n")
+    f.write("\n")
+    f.write("Lasso (L1):\n")
+    f.write("-" * 60 + "\n")
+    f.write(f"{'Lambda':<12} {'Train RMSE':<15} {'Val RMSE':<15}\n")
+    f.write("-" * 60 + "\n")
+    for lam, tr, va in zip(lambdas, lasso_train, lasso_val):
+        f.write(f"{lam:<12.6f} {tr:<15.6f} {va:<15.6f}\n")
+
+print(f"✅ Saved results to: {results_filename}")
+
+print("\nRidge:")
 for lam, tr, va in zip(lambdas, ridge_train, ridge_val):
     print(f"  {lam:>8}: train={tr:.6f}, val={va:.6f}")
 print("\nLasso:")
