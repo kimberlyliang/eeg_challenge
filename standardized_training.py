@@ -139,6 +139,10 @@ def load_release(release_id, data_dir="data_new_new"):
     - Inside each release: *-bdf/ folders (e.g., ds005505-bdf/)
     - Inside each *-bdf folder: sub-*/eeg/ directories
     - Inside eeg/: BDF files with *contrastChangeDetection*.bdf
+    
+    Note: EEGChallengeDataset has an internal mapping of release numbers to dataset folder names.
+    If the expected folder doesn't exist, it will fail. This function will show what folders
+    actually exist to help debug mismatches.
     """
     release_dir = Path(data_dir) / f"release_{release_id}"
     
@@ -154,7 +158,26 @@ def load_release(release_id, data_dir="data_new_new"):
         return None
     
     print(f"Loading Release R{release_id} from: {release_dir.resolve()}")
-    print(f"   Found {len(bdf_folders)} dataset folder(s): {[f.name for f in bdf_folders[:3]]}")
+    print(f"   Found {len(bdf_folders)} dataset folder(s): {[f.name for f in bdf_folders]}")
+    
+    # Expected mapping (from challenge notebooks)
+    # R11 should map to ds005515-bdf, but EEGChallengeDataset might expect ds005516-bdf
+    # Check if the expected folder exists
+    expected_mapping = {
+        1: "ds005505-bdf", 2: "ds005506-bdf", 3: "ds005507-bdf",
+        4: "ds005508-bdf", 5: "ds005509-bdf", 6: "ds005510-bdf",
+        7: "ds005511-bdf", 8: "ds005512-bdf", 9: "ds005513-bdf",
+        10: "ds005514-bdf", 11: "ds005515-bdf",
+    }
+    
+    expected_folder = expected_mapping.get(release_id)
+    if expected_folder:
+        expected_path = release_dir / expected_folder
+        if not expected_path.exists():
+            actual_folders = [f.name for f in bdf_folders]
+            print(f"   ⚠️  Expected folder '{expected_folder}' not found!")
+            print(f"   Found folders: {actual_folders}")
+            print(f"   EEGChallengeDataset may fail if it expects a different folder name.")
     
     try:
         dataset = EEGChallengeDataset(
@@ -174,8 +197,25 @@ def load_release(release_id, data_dir="data_new_new"):
             total_bdfs = sum(len(list(bdf_folder.rglob("*.bdf"))) for bdf_folder in bdf_folders)
             print(f"   Found {total_bdfs} total BDF files in release folder")
             return None
+    except ValueError as e:
+        # Handle the specific error about missing data_dir
+        error_msg = str(e)
+        if "does not exist" in error_msg:
+            # Extract the expected folder name from the error
+            import re
+            match = re.search(r'data_new_new/release_\d+/([^/]+)', error_msg)
+            if match:
+                expected_name = match.group(1)
+                actual_folders = [f.name for f in bdf_folders]
+                print(f"   ❌ EEGChallengeDataset expects folder: {expected_name}")
+                print(f"   But found folders: {actual_folders}")
+                if expected_name not in actual_folders and len(actual_folders) > 0:
+                    print(f"   💡 Suggestion: The folder name mismatch might be due to dataset version differences.")
+                    print(f"   You may need to rename or symlink the folder to match what EEGChallengeDataset expects.")
+        print(f"⚠️  Failed to load Release {release_id}: {error_msg[:300]}")
+        return None
     except Exception as e:
-        print(f"⚠️  Failed to load Release {release_id}: {str(e)[:200]}")
+        print(f"⚠️  Failed to load Release {release_id}: {str(e)[:300]}")
         import traceback
         traceback.print_exc()
     return None
