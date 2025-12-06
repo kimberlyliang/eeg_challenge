@@ -28,6 +28,7 @@ Models included (21 total):
 """
 
 import os
+import warnings
 import numpy as np
 import torch
 from torch import nn
@@ -40,11 +41,18 @@ from sklearn.utils import check_random_state
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.ensemble import RandomForestRegressor
+from scipy import stats
+from scipy.stats import skew, kurtosis
 import copy
 import json
 import matplotlib.pyplot as plt
 from datetime import datetime
 from collections import defaultdict
+
+# Suppress expected warnings during feature extraction
+# (precision loss in skew/kurtosis is expected when data has low variance)
+warnings.filterwarnings('ignore', category=RuntimeWarning,
+                       message='.*Precision loss.*|.*invalid value.*|.*divide by zero.*')
 
 # Braindecode imports
 from braindecode.models import (
@@ -121,24 +129,38 @@ print("=" * 70)
 # ============================================================
 # 1. DATA LOADING WITH STANDARDIZED SPLIT
 # ============================================================
-def load_release(release_id, data_dir="data_merged"):
+def load_release(release_id, data_dir="data_new_new"):
     """
     Load data from a specific release folder (same approach as eeg_conformer_reg.py)
     Uses cache_dir to point to existing data, avoiding unnecessary downloads
+    
+    Expected structure (based on checkfiles.py):
+    - data_new_new/release_X/ (where X is the release number)
+    - Inside each release: *-bdf/ folders (e.g., ds005505-bdf/)
+    - Inside each *-bdf folder: sub-*/eeg/ directories
+    - Inside eeg/: BDF files with *contrastChangeDetection*.bdf
     """
-    release_dir = Path(f"{data_dir}/release_{release_id}")
+    release_dir = Path(data_dir) / f"release_{release_id}"
     
     if not release_dir.exists():
-        print(f"⚠️  Release {release_id} folder not found: {release_dir}")
+        print(f"⚠️  Release {release_id} folder not found: {release_dir.resolve()}")
+        return None
+    
+    # Verify the structure: check for *-bdf folders inside the release directory
+    bdf_folders = list(release_dir.glob("*-bdf"))
+    if not bdf_folders:
+        print(f"⚠️  No *-bdf folders found in {release_dir.resolve()}")
+        print(f"   Expected structure: {release_dir}/ds*****-bdf/")
         return None
     
     print(f"Loading Release R{release_id} from: {release_dir.resolve()}")
+    print(f"   Found {len(bdf_folders)} dataset folder(s): {[f.name for f in bdf_folders[:3]]}")
     
     try:
         dataset = EEGChallengeDataset(
             task="contrastChangeDetection",
             release=f"R{release_id}",
-            cache_dir=release_dir,
+            cache_dir=release_dir,  # EEGChallengeDataset will look for *-bdf folders inside
             mini=False,
             download=False  # Prevent downloading - use only local data
         )
@@ -148,10 +170,15 @@ def load_release(release_id, data_dir="data_merged"):
             return dataset
         else:
             print(f"⚠️  Release {release_id} loaded but has no datasets")
+            # Additional debugging: check for BDF files
+            total_bdfs = sum(len(list(bdf_folder.rglob("*.bdf"))) for bdf_folder in bdf_folders)
+            print(f"   Found {total_bdfs} total BDF files in release folder")
             return None
     except Exception as e:
         print(f"⚠️  Failed to load Release {release_id}: {str(e)[:200]}")
-        return None
+        import traceback
+        traceback.print_exc()
+    return None
 
 
 def preprocess_and_window_dataset(dataset, release_id):
@@ -260,6 +287,7 @@ def extract_features_from_window(window_np, fs=100.0):
     Extract features from EEG window (same as submission_5/submission.py)
     Returns: feature vector of length 1161 (129 channels * 9 features per channel)
     """
+    import warnings
     from scipy.signal import welch
     from scipy.stats import skew, kurtosis
     
@@ -267,13 +295,19 @@ def extract_features_from_window(window_np, fs=100.0):
         """Compute bandpower using Welch's method"""
         f, Pxx = welch(data, fs=fs, nperseg=min(256, len(data)), nfft=1024)
         band = (f >= fmin) & (f <= fmax)
-        return np.trapz(Pxx[band], f[band])
+        # Use trapezoid instead of deprecated trapz
+        return np.trapezoid(Pxx[band], f[band])
     
     # Basic stats
     means = window_np.mean(axis=1)
     stds = window_np.std(axis=1) + 1e-8
-    skews = skew(window_np, axis=1, bias=False, nan_policy='omit')
-    kurts = kurtosis(window_np, axis=1, fisher=True, bias=False, nan_policy='omit')
+    
+    # Suppress warnings for skew/kurtosis when data has low variance (expected)
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning, 
+                                message='.*Precision loss.*|.*invalid value.*|.*divide by zero.*')
+        skews = skew(window_np, axis=1, bias=False, nan_policy='omit')
+        kurts = kurtosis(window_np, axis=1, fisher=True, bias=False, nan_policy='omit')
     
     # Frequency bands
     bands = {
@@ -307,13 +341,18 @@ def extract_features_from_window(window_np, fs=100.0):
 
 def extract_features_from_dataset(windows):
     """Extract features from all windows in dataset"""
+    import warnings
     print("🔧 Extracting features from dataset...")
     features = []
     targets = []
     
+    # Suppress deprecation warnings for array-to-scalar conversion
+    warnings.filterwarnings('ignore', category=DeprecationWarning, 
+                          message='.*Conversion of an array.*')
+    
     for i in tqdm(range(len(windows)), desc="Extracting features"):
         window_data = windows[i][0]  # (n_chans, n_times)
-        target = windows[i][1]  # scalar
+        target = windows[i][1]  # scalar or array
         
         # Convert to numpy if needed
         if isinstance(window_data, torch.Tensor):
@@ -323,7 +362,16 @@ def extract_features_from_dataset(windows):
         
         feat = extract_features_from_window(window_np, fs=SFREQ)
         features.append(feat)
-        targets.append(float(target))
+        
+        # Handle target conversion properly (handle both scalar and array cases)
+        if isinstance(target, (np.ndarray, torch.Tensor)):
+            if isinstance(target, torch.Tensor):
+                target = target.item() if target.numel() == 1 else float(target.flatten()[0])
+            else:
+                target = target.item() if target.size == 1 else float(target.flatten()[0])
+        else:
+            target = float(target)
+        targets.append(target)
     
     return np.array(features), np.array(targets)
 
@@ -377,9 +425,11 @@ class CNN1D(nn.Module):
         self.bn3 = nn.BatchNorm1d(256)
         self.pool3 = nn.MaxPool1d(2)
         
-        self.fc_input_size = 256 * (n_times // 8)
+        # Calculate the actual size after convolutions and pooling
+        # Use adaptive pooling to avoid size calculation issues
+        self.adaptive_pool = nn.AdaptiveAvgPool1d(1)
         self.classifier = nn.Sequential(
-            nn.Linear(self.fc_input_size, 512),
+            nn.Linear(256, 512),
             nn.ReLU(),
             nn.Dropout(0.5),
             nn.Linear(512, 128),
@@ -392,7 +442,9 @@ class CNN1D(nn.Module):
         x = self.pool1(torch.relu(self.bn1(self.conv1(x))))
         x = self.pool2(torch.relu(self.bn2(self.conv2(x))))
         x = self.pool3(torch.relu(self.bn3(self.conv3(x))))
-        x = x.view(x.size(0), -1)
+        # Use adaptive pooling to get fixed size output
+        x = self.adaptive_pool(x)  # (batch, 256, 1)
+        x = x.view(x.size(0), -1)  # (batch, 256)
         return self.classifier(x).squeeze(-1)
 
 
@@ -1140,18 +1192,33 @@ def train_linear_model(model_class, model_name, param_grid=None):
     print(f"Training {model_name}")
     print(f"{'='*70}")
     
+    # Set convergence parameters for Lasso to avoid warnings
+    if model_name == 'Lasso':
+        # Lasso needs more iterations and tighter tolerance for convergence
+        default_kwargs = {'max_iter': 5000, 'tol': 1e-4}
+    elif model_name == 'Ridge':
+        # Ridge usually converges fine, but set max_iter to be safe
+        default_kwargs = {'max_iter': 2000}
+    else:
+        default_kwargs = {}
+    
     if param_grid is None:
         # Default: just train without tuning
-        model = model_class()
+        model = model_class(**default_kwargs)
         model.fit(X_train_scaled, y_train)
         val_pred = model.predict(X_val_scaled)
         val_rmse = np.sqrt(np.mean((val_pred - y_val) ** 2))
         best_params = None
     else:
         # Grid search on validation set
-        print(f"🔍 Hyperparameter tuning with {len(param_grid)} combinations...")
+        # Need to add default_kwargs to each parameter combination
+        print(f"🔍 Hyperparameter tuning with {len(list(param_grid.values())[0])} combinations...")
+        
+        # Create estimator with default kwargs
+        base_estimator = model_class(**default_kwargs)
+        
         model = GridSearchCV(
-            model_class(), 
+            base_estimator, 
             param_grid, 
             cv=3,  # 3-fold CV on training set
             scoring='neg_mean_squared_error',
@@ -1902,5 +1969,163 @@ total_saved = (len(saved_models['neural_networks']) +
 
 print(f"\n✅ Total files saved: {total_saved}")
 print(f"📁 All files in: {RESULTS_DIR}/")
+print("=" * 70)
+
+# ============================================================
+# 9. CREATE SUMMARY COMPARISON VISUALIZATIONS
+# ============================================================
+print("\n" + "=" * 70)
+print("CREATING SUMMARY COMPARISON VISUALIZATIONS")
+print("=" * 70)
+
+try:
+    # 1. Bar chart comparing all models' validation RMSE
+    model_names = []
+    val_rmses = []
+    val_nrmses = []
+    test_rmses = []
+    test_nrmses = []
+    
+    for model_name, result in summary['validation_results'].items():
+        model_names.append(model_name)
+        if 'best_rmse' in result:
+            val_rmses.append(result['best_rmse'])
+            val_nrmses.append(result.get('best_nrmse', None))
+        else:
+            val_rmses.append(result['val_rmse'])
+            val_nrmses.append(None)
+        
+        # Get test results if available
+        if model_name in summary.get('test_results', {}):
+            test_result = summary['test_results'][model_name]
+            if isinstance(test_result, dict):
+                test_rmses.append(test_result.get('rmse', None))
+                test_nrmses.append(test_result.get('nrmse', None))
+            else:
+                test_rmses.append(test_result)
+                test_nrmses.append(None)
+        else:
+            test_rmses.append(None)
+            test_nrmses.append(None)
+    
+    # Create comparison plots
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    
+    # 1. Validation RMSE comparison
+    x_pos = np.arange(len(model_names))
+    axes[0, 0].barh(x_pos, val_rmses, alpha=0.7, color='steelblue')
+    axes[0, 0].set_yticks(x_pos)
+    axes[0, 0].set_yticklabels(model_names, fontsize=8)
+    axes[0, 0].set_xlabel('Validation RMSE')
+    axes[0, 0].set_title('Validation RMSE Comparison (Release 5)')
+    axes[0, 0].grid(True, alpha=0.3, axis='x')
+    # Add value labels on bars
+    for i, v in enumerate(val_rmses):
+        axes[0, 0].text(v + max(val_rmses) * 0.01, i, f'{v:.4f}', 
+                       va='center', fontsize=7)
+    
+    # 2. Validation NRMSE comparison (if available)
+    val_nrmses_available = [n for n in val_nrmses if n is not None]
+    if val_nrmses_available:
+        model_names_nrmse = [model_names[i] for i, n in enumerate(val_nrmses) if n is not None]
+        x_pos_nrmse = np.arange(len(model_names_nrmse))
+        axes[0, 1].barh(x_pos_nrmse, val_nrmses_available, alpha=0.7, color='coral')
+        axes[0, 1].set_yticks(x_pos_nrmse)
+        axes[0, 1].set_yticklabels(model_names_nrmse, fontsize=8)
+        axes[0, 1].set_xlabel('Validation NRMSE')
+        axes[0, 1].set_title('Validation NRMSE Comparison (Release 5)')
+        axes[0, 1].grid(True, alpha=0.3, axis='x')
+        for i, v in enumerate(val_nrmses_available):
+            axes[0, 1].text(v + max(val_nrmses_available) * 0.01, i, f'{v:.4f}', 
+                           va='center', fontsize=7)
+    else:
+        axes[0, 1].text(0.5, 0.5, 'NRMSE data not available', 
+                       ha='center', va='center', transform=axes[0, 1].transAxes)
+        axes[0, 1].set_title('Validation NRMSE Comparison')
+    
+    # 3. Test RMSE comparison (if available)
+    test_rmses_available = [r for r in test_rmses if r is not None]
+    if test_rmses_available:
+        model_names_test = [model_names[i] for i, r in enumerate(test_rmses) if r is not None]
+        x_pos_test = np.arange(len(model_names_test))
+        axes[1, 0].barh(x_pos_test, test_rmses_available, alpha=0.7, color='mediumseagreen')
+        axes[1, 0].set_yticks(x_pos_test)
+        axes[1, 0].set_yticklabels(model_names_test, fontsize=8)
+        axes[1, 0].set_xlabel('Test RMSE')
+        axes[1, 0].set_title('Test RMSE Comparison (Release 11)')
+        axes[1, 0].grid(True, alpha=0.3, axis='x')
+        for i, v in enumerate(test_rmses_available):
+            axes[1, 0].text(v + max(test_rmses_available) * 0.01, i, f'{v:.4f}', 
+                           va='center', fontsize=7)
+    else:
+        axes[1, 0].text(0.5, 0.5, 'Test results not available', 
+                       ha='center', va='center', transform=axes[1, 0].transAxes)
+        axes[1, 0].set_title('Test RMSE Comparison')
+    
+    # 4. Test NRMSE comparison (if available)
+    test_nrmses_available = [n for n in test_nrmses if n is not None]
+    if test_nrmses_available:
+        model_names_test_nrmse = [model_names[i] for i, n in enumerate(test_nrmses) if n is not None]
+        x_pos_test_nrmse = np.arange(len(model_names_test_nrmse))
+        axes[1, 1].barh(x_pos_test_nrmse, test_nrmses_available, alpha=0.7, color='gold')
+        axes[1, 1].set_yticks(x_pos_test_nrmse)
+        axes[1, 1].set_yticklabels(model_names_test_nrmse, fontsize=8)
+        axes[1, 1].set_xlabel('Test NRMSE')
+        axes[1, 1].set_title('Test NRMSE Comparison (Release 11)')
+        axes[1, 1].grid(True, alpha=0.3, axis='x')
+        for i, v in enumerate(test_nrmses_available):
+            axes[1, 1].text(v + max(test_nrmses_available) * 0.01, i, f'{v:.4f}', 
+                           va='center', fontsize=7)
+    else:
+        axes[1, 1].text(0.5, 0.5, 'Test NRMSE data not available', 
+                       ha='center', va='center', transform=axes[1, 1].transAxes)
+        axes[1, 1].set_title('Test NRMSE Comparison')
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(RESULTS_DIR, "model_comparison_summary.png"), 
+                dpi=300, bbox_inches='tight')
+    plt.close()
+    print("✅ Model comparison summary saved: model_comparison_summary.png")
+    
+    # 2. Create a single combined bar chart (Val vs Test RMSE)
+    if test_rmses_available:
+        # Only plot models that have both val and test results
+        combined_models = []
+        combined_val = []
+        combined_test = []
+        for i, name in enumerate(model_names):
+            if val_rmses[i] is not None and test_rmses[i] is not None:
+                combined_models.append(name)
+                combined_val.append(val_rmses[i])
+                combined_test.append(test_rmses[i])
+        
+        if combined_models:
+            fig, ax = plt.subplots(figsize=(14, max(8, len(combined_models) * 0.4)))
+            x_pos = np.arange(len(combined_models))
+            width = 0.35
+            
+            ax.barh(x_pos - width/2, combined_val, width, label='Validation RMSE (R5)', 
+                   alpha=0.8, color='steelblue')
+            ax.barh(x_pos + width/2, combined_test, width, label='Test RMSE (R11)', 
+                   alpha=0.8, color='mediumseagreen')
+            
+            ax.set_yticks(x_pos)
+            ax.set_yticklabels(combined_models, fontsize=9)
+            ax.set_xlabel('RMSE', fontsize=11)
+            ax.set_title('Model Performance Comparison: Validation vs Test', fontsize=12, fontweight='bold')
+            ax.legend(fontsize=10)
+            ax.grid(True, alpha=0.3, axis='x')
+            
+            plt.tight_layout()
+            plt.savefig(os.path.join(RESULTS_DIR, "model_comparison_val_vs_test.png"), 
+                       dpi=300, bbox_inches='tight')
+            plt.close()
+            print("✅ Validation vs Test comparison saved: model_comparison_val_vs_test.png")
+    
+except Exception as e:
+    print(f"⚠️  Warning: Could not create summary visualizations: {e}")
+    import traceback
+    traceback.print_exc()
+
 print("=" * 70)
 
