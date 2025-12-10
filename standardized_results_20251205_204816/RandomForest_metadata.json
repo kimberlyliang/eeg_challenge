@@ -1,0 +1,12 @@
+{
+  "model_name": "RandomForest",
+  "best_params": {
+    "max_depth": 10,
+    "min_samples_split": 2,
+    "n_estimators": 200
+  },
+  "val_rmse": 0.3871215908976254,
+  "n_features": 1161,
+  "n_train_samples": 72556,
+  "n_val_samples": 15560
+}
