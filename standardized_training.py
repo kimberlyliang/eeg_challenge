@@ -505,8 +505,17 @@ class SimpleEEGNet(nn.Module):
         self.feature_activation = nn.ELU()
         self.feature_pool = nn.AvgPool2d((1, 8))
         
+        # Calculate actual output dimension after pooling
+        # spatial_pool: kernel=4, default stride=4 -> divides by 4
+        # feature_pool: kernel=8, default stride=8 -> divides by 8
+        # Total reduction: 4 * 8 = 32
+        # After spatial_pool: n_times // 4
+        # After feature_pool: (n_times // 4) // 8 = n_times // 32
+        spatial_pool_stride = 4  # default stride equals kernel
+        feature_pool_stride = 8  # default stride equals kernel
+        pooled_time_dim = (n_times // spatial_pool_stride) // feature_pool_stride
         self.classifier = nn.Sequential(
-            nn.Linear(32 * (n_times // 32), 128),
+            nn.Linear(32 * pooled_time_dim, 128),
             nn.ELU(),
             nn.Dropout(0.5),
             nn.Linear(128, n_outputs)
@@ -686,7 +695,13 @@ class HybridEEGRegressor(nn.Module):
         self.activation = nn.ELU()
         self.pool_time = nn.AvgPool2d((1, 75), stride=(1, 15))
         self.dropout_cnn = nn.Dropout(dropout)
-        self.cnn_out_dim = n_filters_spatial * (n_times // 15)
+        # Calculate actual pooling output size using PyTorch formula:
+        # output_size = floor((input_size - kernel_size) / stride) + 1
+        # Note: conv_time preserves n_times due to padding, conv_spatial reduces spatial dim to 1
+        pool_kernel_size = 75
+        pool_stride = 15
+        pooled_time_dim = (n_times - pool_kernel_size) // pool_stride + 1
+        self.cnn_out_dim = n_filters_spatial * pooled_time_dim
         
         # Transformer branch
         self.input_projection = nn.Linear(n_chans, embed_dim)
