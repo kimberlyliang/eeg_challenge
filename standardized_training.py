@@ -125,11 +125,47 @@ print(f"  Training: Releases {TRAIN_RELEASES}")
 print(f"  Validation: Release {VAL_RELEASE}")
 print(f"  Testing: Release {TEST_RELEASE}")
 print("=" * 70)
+print("\n💡 NOTE: You may see warnings about 'Missing: _eeg.bdf' files.")
+print("   This is EXPECTED and can be safely ignored.")
+print("   EEGChallengeDataset checks for ALL tasks, but we only have")
+print("   contrastChangeDetection task files. The missing files are for other tasks.")
+print("=" * 70)
 
 # ============================================================
 # 1. DATA LOADING WITH STANDARDIZED SPLIT
 # ============================================================
-def load_release(release_id, data_dir="data_new_new"):
+def find_data_directory():
+    """
+    Find the data directory by checking multiple possible locations.
+    Works for both local and GPU server environments.
+    """
+    # Try multiple possible locations
+    possible_paths = [
+        Path("data_new_new"),  # Relative path (local)
+        Path("/users/kimliang/eeg_challenge/data_new_new"),  # GPU server path
+        Path(os.getcwd()) / "data_new_new",  # Current directory
+        Path(__file__).parent / "data_new_new",  # Script directory
+    ]
+    
+    # Also check environment variable
+    if "EEG_DATA_DIR" in os.environ:
+        possible_paths.insert(0, Path(os.environ["EEG_DATA_DIR"]))
+    
+    for data_path in possible_paths:
+        if data_path.exists() and data_path.is_dir():
+            # Verify it has release folders
+            releases = list(data_path.glob("release_*"))
+            if releases:
+                print(f"📁 Found data directory: {data_path.resolve()}")
+                return data_path
+    
+    # Default fallback
+    default_path = Path("data_new_new")
+    print(f"⚠️  Using default data directory: {default_path.resolve()}")
+    print(f"   (Set EEG_DATA_DIR environment variable to specify a different location)")
+    return default_path
+
+def load_release(release_id, data_dir=None):
     """
     Load data from a specific release folder (same approach as eeg_conformer_reg.py)
     Uses cache_dir to point to existing data, avoiding unnecessary downloads
@@ -143,7 +179,13 @@ def load_release(release_id, data_dir="data_new_new"):
     Note: EEGChallengeDataset has an internal mapping of release numbers to dataset folder names.
     If the expected folder doesn't exist, it will fail. This function will show what folders
     actually exist to help debug mismatches.
+    
+    The missing BDF file warnings are expected - EEGChallengeDataset checks for ALL tasks,
+    but we only have contrastChangeDetection task files. These warnings can be safely ignored.
     """
+    if data_dir is None:
+        data_dir = find_data_directory()
+    
     release_dir = Path(data_dir) / f"release_{release_id}"
     
     if not release_dir.exists():
@@ -180,13 +222,21 @@ def load_release(release_id, data_dir="data_new_new"):
             print(f"   EEGChallengeDataset may fail if it expects a different folder name.")
     
     try:
-        dataset = EEGChallengeDataset(
-            task="contrastChangeDetection",
-            release=f"R{release_id}",
-            cache_dir=release_dir,  # EEGChallengeDataset will look for *-bdf folders inside
-            mini=False,
-            download=False  # Prevent downloading - use only local data
-        )
+        # Note: EEGChallengeDataset may print warnings about missing BDF files for other tasks.
+        # This is EXPECTED and can be safely ignored - we only have contrastChangeDetection task files.
+        # The library checks for all possible tasks, but we only need the one we're loading.
+        import warnings
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', message='.*Missing.*bdf.*')
+            warnings.filterwarnings('ignore', message='.*Task/run.*')
+            
+            dataset = EEGChallengeDataset(
+                task="contrastChangeDetection",
+                release=f"R{release_id}",
+                cache_dir=release_dir,  # EEGChallengeDataset will look for *-bdf folders inside
+                mini=False,
+                download=False  # Prevent downloading - use only local data
+            )
         
         if len(dataset.datasets) > 0:
             print(f"✅ Loaded {len(dataset.datasets)} recordings from Release R{release_id}")
