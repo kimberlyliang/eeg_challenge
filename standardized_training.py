@@ -299,7 +299,10 @@ print(f"\n📐 Detected input shape: n_chans={n_chans}, n_times={n_times}")
 # ============================================================
 # 2. FEATURE EXTRACTION FOR LINEAR/TREE MODELS
 # ============================================================
-def extract_features_from_window(window_np, fs=100.0):
+# NOTE: Feature extraction is commented out since linear/tree models are disabled
+# Uncomment this section if you want to train linear/tree models
+
+# def extract_features_from_window(window_np, fs=100.0):
     """
     Extract features from EEG window (same as submission_5/submission.py)
     Returns: feature vector of length 1161 (129 channels * 9 features per channel)
@@ -394,28 +397,30 @@ def extract_features_from_dataset(windows):
 
 
 # Extract features for linear/tree models
-print("\n" + "=" * 70)
-print("EXTRACTING FEATURES FOR LINEAR/TREE MODELS")
-print("=" * 70)
+# NOTE: Commented out since linear/tree models are disabled
+# print("\n" + "=" * 70)
+# print("EXTRACTING FEATURES FOR LINEAR/TREE MODELS")
+# print("=" * 70)
 
-X_train, y_train = extract_features_from_dataset(train_windows)
-X_val, y_val = extract_features_from_dataset(val_windows)
-if test_windows is not None:
-    X_test, y_test = extract_features_from_dataset(test_windows)
-else:
-    X_test, y_test = None, None
+# X_train, y_train = extract_features_from_dataset(train_windows)
+# X_val, y_val = extract_features_from_dataset(val_windows)
+# if test_windows is not None:
+#     X_test, y_test = extract_features_from_dataset(test_windows)
+# else:
+#     X_test, y_test = None, None
 
-print(f"✅ Training features: {X_train.shape}")
-print(f"✅ Validation features: {X_val.shape}")
-if X_test is not None:
-    print(f"✅ Test features: {X_test.shape}")
+# print(f"✅ Training features: {X_train.shape}")
+# print(f"✅ Validation features: {X_val.shape}")
+# if X_test is not None:
+#     print(f"✅ Test features: {X_test.shape}")
 
 # Scale features
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_val_scaled = scaler.transform(X_val)
-if X_test is not None:
-    X_test_scaled = scaler.transform(X_test)
+# NOTE: Scaler initialization commented out since linear/tree models are disabled
+# scaler = StandardScaler()
+# X_train_scaled = scaler.fit_transform(X_train)
+# X_val_scaled = scaler.transform(X_val)
+# if X_test is not None:
+#     X_test_scaled = scaler.transform(X_test)
 
 # ============================================================
 # 3. MODEL DEFINITIONS
