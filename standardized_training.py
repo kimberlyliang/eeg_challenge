@@ -134,141 +134,35 @@ print("=" * 70)
 # ============================================================
 # 1. DATA LOADING WITH STANDARDIZED SPLIT
 # ============================================================
-def find_data_directory():
-    """
-    Find the data directory by checking multiple possible locations.
-    Works for both local and GPU server environments.
-    """
-    # Try multiple possible locations
-    possible_paths = [
-        Path("data_new_new"),  # Relative path (local)
-        Path("/users/kimliang/eeg_challenge/data_new_new"),  # GPU server path
-        Path(os.getcwd()) / "data_new_new",  # Current directory
-        Path(__file__).parent / "data_new_new",  # Script directory
-    ]
-    
-    # Also check environment variable
-    if "EEG_DATA_DIR" in os.environ:
-        possible_paths.insert(0, Path(os.environ["EEG_DATA_DIR"]))
-    
-    for data_path in possible_paths:
-        if data_path.exists() and data_path.is_dir():
-            # Verify it has release folders
-            releases = list(data_path.glob("release_*"))
-            if releases:
-                print(f"📁 Found data directory: {data_path.resolve()}")
-                return data_path
-    
-    # Default fallback
-    default_path = Path("data_new_new")
-    print(f"⚠️  Using default data directory: {default_path.resolve()}")
-    print(f"   (Set EEG_DATA_DIR environment variable to specify a different location)")
-    return default_path
-
-def load_release(release_id, data_dir=None):
+def load_release(release_id, task="contrastChangeDetection"):
     """
     Load data from a specific release folder (same approach as eeg_conformer_reg.py)
-    Uses cache_dir to point to existing data, avoiding unnecessary downloads
     
-    Expected structure (based on checkfiles.py):
-    - data_new_new/release_X/ (where X is the release number)
-    - Inside each release: *-bdf/ folders (e.g., ds005505-bdf/)
-    - Inside each *-bdf folder: sub-*/eeg/ directories
-    - Inside eeg/: BDF files with *contrastChangeDetection*.bdf
+    Args:
+        release_id (int): Release number (1-11)
+        task (str): Task name
     
-    Note: EEGChallengeDataset has an internal mapping of release numbers to dataset folder names.
-    If the expected folder doesn't exist, it will fail. This function will show what folders
-    actually exist to help debug mismatches.
-    
-    The missing BDF file warnings are expected - EEGChallengeDataset checks for ALL tasks,
-    but we only have contrastChangeDetection task files. These warnings can be safely ignored.
+    Returns:
+        EEGChallengeDataset: Loaded dataset or None if not found
     """
-    if data_dir is None:
-        data_dir = find_data_directory()
-    
-    release_dir = Path(data_dir) / f"release_{release_id}"
+    release_dir = Path(f"data_new_new/release_{release_id}")
     
     if not release_dir.exists():
         print(f"⚠️  Release {release_id} folder not found: {release_dir.resolve()}")
         return None
     
-    # Verify the structure: check for *-bdf folders inside the release directory
-    bdf_folders = list(release_dir.glob("*-bdf"))
-    if not bdf_folders:
-        print(f"⚠️  No *-bdf folders found in {release_dir.resolve()}")
-        print(f"   Expected structure: {release_dir}/ds*****-bdf/")
-        return None
-    
     print(f"Loading Release R{release_id} from: {release_dir.resolve()}")
-    print(f"   Found {len(bdf_folders)} dataset folder(s): {[f.name for f in bdf_folders]}")
     
-    # Expected mapping (from challenge notebooks)
-    # R11 should map to ds005515-bdf, but EEGChallengeDataset might expect ds005516-bdf
-    # Check if the expected folder exists
-    expected_mapping = {
-        1: "ds005505-bdf", 2: "ds005506-bdf", 3: "ds005507-bdf",
-        4: "ds005508-bdf", 5: "ds005509-bdf", 6: "ds005510-bdf",
-        7: "ds005511-bdf", 8: "ds005512-bdf", 9: "ds005513-bdf",
-        10: "ds005514-bdf", 11: "ds005515-bdf",
-    }
+    dataset = EEGChallengeDataset(
+        task=task,
+        release=f"R{release_id}",
+        cache_dir=release_dir,
+        mini=False,  # Always use full dataset, not mini
+        download=False  # Never download - use only local data
+    )
     
-    expected_folder = expected_mapping.get(release_id)
-    if expected_folder:
-        expected_path = release_dir / expected_folder
-        if not expected_path.exists():
-            actual_folders = [f.name for f in bdf_folders]
-            print(f"   ⚠️  Expected folder '{expected_folder}' not found!")
-            print(f"   Found folders: {actual_folders}")
-            print(f"   EEGChallengeDataset may fail if it expects a different folder name.")
-    
-    try:
-        # Note: EEGChallengeDataset may print warnings about missing BDF files for other tasks.
-        # This is EXPECTED and can be safely ignored - we only have contrastChangeDetection task files.
-        # The library checks for all possible tasks, but we only need the one we're loading.
-        import warnings
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', message='.*Missing.*bdf.*')
-            warnings.filterwarnings('ignore', message='.*Task/run.*')
-            
-            dataset = EEGChallengeDataset(
-                task="contrastChangeDetection",
-                release=f"R{release_id}",
-                cache_dir=release_dir,  # EEGChallengeDataset will look for *-bdf folders inside
-                mini=False,
-                download=False  # Prevent downloading - use only local data
-            )
-        
-        if len(dataset.datasets) > 0:
-            print(f"✅ Loaded {len(dataset.datasets)} recordings from Release R{release_id}")
-            return dataset
-        else:
-            print(f"⚠️  Release {release_id} loaded but has no datasets")
-            # Additional debugging: check for BDF files
-            total_bdfs = sum(len(list(bdf_folder.rglob("*.bdf"))) for bdf_folder in bdf_folders)
-            print(f"   Found {total_bdfs} total BDF files in release folder")
-            return None
-    except ValueError as e:
-        # Handle the specific error about missing data_dir
-        error_msg = str(e)
-        if "does not exist" in error_msg:
-            # Extract the expected folder name from the error
-            import re
-            match = re.search(r'data_new_new/release_\d+/([^/]+)', error_msg)
-            if match:
-                expected_name = match.group(1)
-                actual_folders = [f.name for f in bdf_folders]
-                print(f"   ❌ EEGChallengeDataset expects folder: {expected_name}")
-                print(f"   But found folders: {actual_folders}")
-                if expected_name not in actual_folders and len(actual_folders) > 0:
-                    print(f"   💡 Suggestion: The folder name mismatch might be due to dataset version differences.")
-                    print(f"   You may need to rename or symlink the folder to match what EEGChallengeDataset expects.")
-        print(f"⚠️  Failed to load Release {release_id}: {error_msg[:300]}")
-        return None
-    except Exception as e:
-        print(f"⚠️  Failed to load Release {release_id}: {str(e)[:300]}")
-        import traceback
-        traceback.print_exc()
-    return None
+    print(f"✅ Loaded {len(dataset.datasets)} recordings from Release R{release_id}")
+    return dataset
 
 
 def preprocess_and_window_dataset(dataset, release_id):
