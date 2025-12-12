@@ -1275,154 +1275,154 @@ results = {}
 # ============================================================
 # LINEAR MODELS
 # ============================================================
-print("\n" + "=" * 70)
-print("LINEAR MODELS")
-print("=" * 70)
+# print("\n" + "=" * 70)
+# print("LINEAR MODELS")
+# print("=" * 70)
 
-# LinearRegression
-results['LinearRegression'] = train_linear_model(
-    LinearRegression, 
-    'LinearRegression'
-)
+# # LinearRegression
+# results['LinearRegression'] = train_linear_model(
+#     LinearRegression, 
+#     'LinearRegression'
+# )
 
-# Ridge with hyperparameter tuning
-ridge_params = {'alpha': [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]}
-results['Ridge'] = train_linear_model(
-    Ridge,
-    'Ridge',
-    param_grid=ridge_params
-)
+# # Ridge with hyperparameter tuning
+# ridge_params = {'alpha': [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]}
+# results['Ridge'] = train_linear_model(
+#     Ridge,
+#     'Ridge',
+#     param_grid=ridge_params
+# )
 
-# Lasso with hyperparameter tuning
-lasso_params = {'alpha': [1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2]}
-results['Lasso'] = train_linear_model(
-    Lasso,
-    'Lasso',
-    param_grid=lasso_params
-)
+# # Lasso with hyperparameter tuning
+# lasso_params = {'alpha': [1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2]}
+# results['Lasso'] = train_linear_model(
+#     Lasso,
+#     'Lasso',
+#     param_grid=lasso_params
+# )
 
 # ============================================================
 # TREE-BASED MODELS
 # ============================================================
-print("\n" + "=" * 70)
-print("TREE-BASED MODELS")
-print("=" * 70)
+# print("\n" + "=" * 70)
+# print("TREE-BASED MODELS")
+# print("=" * 70)
 
-# RandomForest with hyperparameter tuning
-rf_params = {
-    'n_estimators': [200, 400, 600],
-    'max_depth': [10, 20, None],
-    'min_samples_split': [2, 5, 10]
-}
-results['RandomForest'] = train_linear_model(
-    RandomForestRegressor,
-    'RandomForest',
-    param_grid=rf_params
-)
+# # RandomForest with hyperparameter tuning
+# rf_params = {
+#     'n_estimators': [200, 400, 600],
+#     'max_depth': [10, 20, None],
+#     'min_samples_split': [2, 5, 10]
+# }
+# results['RandomForest'] = train_linear_model(
+#     RandomForestRegressor,
+#     'RandomForest',
+#     param_grid=rf_params
+# )
 
-# XGBoost with hyperparameter tuning
-if HAS_XGB:
-    xgb_params = {
-        'n_estimators': [300, 500, 700],
-        'learning_rate': [0.01, 0.05, 0.1],
-        'max_depth': [4, 6, 8],
-        'reg_lambda': [0.5, 1.0, 2.0]
-    }
-    results['XGBoost'] = train_linear_model(
-        XGBRegressor,
-        'XGBoost',
-        param_grid=xgb_params
-    )
+# # XGBoost with hyperparameter tuning
+# if HAS_XGB:
+#     xgb_params = {
+#         'n_estimators': [300, 500, 700],
+#         'learning_rate': [0.01, 0.05, 0.1],
+#         'max_depth': [4, 6, 8],
+#         'reg_lambda': [0.5, 1.0, 2.0]
+#     }
+#     results['XGBoost'] = train_linear_model(
+#         XGBRegressor,
+#         'XGBoost',
+#         param_grid=xgb_params
+#     )
 
 # ============================================================
 # NEURAL NETWORK MODELS
 # ============================================================
-print("\n" + "=" * 70)
-print("NEURAL NETWORK MODELS")
-print("=" * 70)
+# print("\n" + "=" * 70)
+# print("NEURAL NETWORK MODELS")
+# print("=" * 70)
 
-# Simple CNNs
-print("\n--- Simple CNNs ---")
-cnn1d_model = CNN1D(n_chans=n_chans, n_times=n_times)
-results['CNN1D'] = train_neural_network(
-    cnn1d_model, train_loader, val_loader, 'CNN1D'
-)
+# # Simple CNNs
+# print("\n--- Simple CNNs ---")
+# cnn1d_model = CNN1D(n_chans=n_chans, n_times=n_times)
+# results['CNN1D'] = train_neural_network(
+#     cnn1d_model, train_loader, val_loader, 'CNN1D'
+# )
 
-simple_eegnet_model = SimpleEEGNet(n_chans=n_chans, n_times=n_times)
-results['SimpleEEGNet'] = train_neural_network(
-    simple_eegnet_model, train_loader, val_loader, 'SimpleEEGNet'
-)
+# simple_eegnet_model = SimpleEEGNet(n_chans=n_chans, n_times=n_times)
+# results['SimpleEEGNet'] = train_neural_network(
+#     simple_eegnet_model, train_loader, val_loader, 'SimpleEEGNet'
+# )
 
-eegnet_custom_model = EEGNet(n_chans=n_chans, n_times=n_times)
-results['EEGNet_Custom'] = train_neural_network(
-    eegnet_custom_model, train_loader, val_loader, 'EEGNet_Custom'
-)
+# eegnet_custom_model = EEGNet(n_chans=n_chans, n_times=n_times)
+# results['EEGNet_Custom'] = train_neural_network(
+#     eegnet_custom_model, train_loader, val_loader, 'EEGNet_Custom'
+# )
 
-cnn_only_model = CNNOnly(n_chans=n_chans, n_times=n_times)
-results['CNN_only'] = train_neural_network(
-    cnn_only_model, train_loader, val_loader, 'CNN_only'
-)
+# cnn_only_model = CNNOnly(n_chans=n_chans, n_times=n_times)
+# results['CNN_only'] = train_neural_network(
+#     cnn_only_model, train_loader, val_loader, 'CNN_only'
+# )
 
-# Moderate CNNs
-print("\n--- Moderate CNNs ---")
-eegnex_custom_model = EEGNeX_Custom(n_chans=n_chans, n_times=n_times)
-results['EEGNeX_Custom'] = train_neural_network(
-    eegnex_custom_model, train_loader, val_loader, 'EEGNeX_Custom'
-)
+# # Moderate CNNs
+# print("\n--- Moderate CNNs ---")
+# eegnex_custom_model = EEGNeX_Custom(n_chans=n_chans, n_times=n_times)
+# results['EEGNeX_Custom'] = train_neural_network(
+#     eegnex_custom_model, train_loader, val_loader, 'EEGNeX_Custom'
+# )
 
-# Braindecode models
-try:
-    eegnex_braindecode = EEGNeX(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
-    results['EEGNeX_Braindecode'] = train_neural_network(
-        eegnex_braindecode, train_loader, val_loader, 'EEGNeX_Braindecode'
-    )
-except Exception as e:
-    print(f"⚠️  Could not train EEGNeX (Braindecode): {e}")
+# # Braindecode models
+# try:
+#     eegnex_braindecode = EEGNeX(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
+#     results['EEGNeX_Braindecode'] = train_neural_network(
+#         eegnex_braindecode, train_loader, val_loader, 'EEGNeX_Braindecode'
+#     )
+# except Exception as e:
+#     print(f"⚠️  Could not train EEGNeX (Braindecode): {e}")
 
-try:
-    eegminer_model = EEGMiner(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
-    results['EEGMiner'] = train_neural_network(
-        eegminer_model, train_loader, val_loader, 'EEGMiner'
-    )
-except Exception as e:
-    print(f"⚠️  Could not train EEGMiner: {e}")
+# try:
+#     eegminer_model = EEGMiner(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
+#     results['EEGMiner'] = train_neural_network(
+#         eegminer_model, train_loader, val_loader, 'EEGMiner'
+#     )
+# except Exception as e:
+#     print(f"⚠️  Could not train EEGMiner: {e}")
 
-try:
-    deep4net_model = Deep4Net(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
-    results['Deep4Net'] = train_neural_network(
-        deep4net_model, train_loader, val_loader, 'Deep4Net'
-    )
-except Exception as e:
-    print(f"⚠️  Could not train Deep4Net: {e}")
+# try:
+#     deep4net_model = Deep4Net(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
+#     results['Deep4Net'] = train_neural_network(
+#         deep4net_model, train_loader, val_loader, 'Deep4Net'
+#     )
+# except Exception as e:
+#     print(f"⚠️  Could not train Deep4Net: {e}")
 
-# Attention-based CNN
-print("\n--- Attention-based CNN ---")
-try:
-    atcnet_model = ATCNet(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
-    results['ATCNet'] = train_neural_network(
-        atcnet_model, train_loader, val_loader, 'ATCNet'
-    )
-except Exception as e:
-    print(f"⚠️  Could not train ATCNet: {e}")
+# # Attention-based CNN
+# print("\n--- Attention-based CNN ---")
+# try:
+#     atcnet_model = ATCNet(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
+#     results['ATCNet'] = train_neural_network(
+#         atcnet_model, train_loader, val_loader, 'ATCNet'
+#     )
+# except Exception as e:
+#     print(f"⚠️  Could not train ATCNet: {e}")
 
-# Transformer Models
-print("\n--- Transformer Models ---")
-simple_conformer_model = SimpleEEGConformer(n_chans=n_chans, n_times=n_times)
-results['SimpleEEGConformer'] = train_neural_network(
-    simple_conformer_model, train_loader, val_loader, 'SimpleEEGConformer'
-)
+# # Transformer Models
+# print("\n--- Transformer Models ---")
+# simple_conformer_model = SimpleEEGConformer(n_chans=n_chans, n_times=n_times)
+# results['SimpleEEGConformer'] = train_neural_network(
+#     simple_conformer_model, train_loader, val_loader, 'SimpleEEGConformer'
+# )
 
-conformer_model = EEGConformer(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
-results['EEGConformer'] = train_neural_network(
-    conformer_model, train_loader, val_loader, 'EEGConformer'
-)
+# conformer_model = EEGConformer(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
+# results['EEGConformer'] = train_neural_network(
+#     conformer_model, train_loader, val_loader, 'EEGConformer'
+# )
 
 # Hybrid Models
 print("\n--- Hybrid Models ---")
-cnn_trans_model = CNNTransformer(n_chans=n_chans, n_times=n_times, dropout=0.3)
-results['CNN_Transformer'] = train_neural_network(
-    cnn_trans_model, train_loader, val_loader, 'CNN_Transformer'
-)
+# cnn_trans_model = CNNTransformer(n_chans=n_chans, n_times=n_times, dropout=0.3)
+# results['CNN_Transformer'] = train_neural_network(
+#     cnn_trans_model, train_loader, val_loader, 'CNN_Transformer'
+# )
 
 hybrid_model = HybridEEGRegressor(n_chans=n_chans, n_times=n_times, dropout=0.3)
 results['HybridEEGRegressor'] = train_neural_network(
