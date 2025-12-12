@@ -151,18 +151,51 @@ def load_release(release_id, task="contrastChangeDetection"):
         print(f"⚠️  Release {release_id} folder not found: {release_dir.resolve()}")
         return None
     
+    # Check if any *-bdf folders exist in the release directory
+    bdf_folders = list(release_dir.glob("*-bdf"))
+    if not bdf_folders:
+        print(f"⚠️  No *-bdf folders found in {release_dir.resolve()}")
+        return None
+    
     print(f"Loading Release R{release_id} from: {release_dir.resolve()}")
+    print(f"   Found dataset folder(s): {[f.name for f in bdf_folders]}")
     
-    dataset = EEGChallengeDataset(
-        task=task,
-        release=f"R{release_id}",
-        cache_dir=release_dir,
-        mini=False,  # Always use full dataset, not mini
-        download=False  # Never download - use only local data
-    )
-    
-    print(f"✅ Loaded {len(dataset.datasets)} recordings from Release R{release_id}")
-    return dataset
+    try:
+        dataset = EEGChallengeDataset(
+            task=task,
+            release=f"R{release_id}",
+            cache_dir=release_dir,
+            mini=False,  # Always use full dataset, not mini
+            download=False  # Never download - use only local data
+        )
+        
+        if len(dataset.datasets) > 0:
+            print(f"✅ Loaded {len(dataset.datasets)} recordings from Release R{release_id}")
+            return dataset
+        else:
+            print(f"⚠️  Release {release_id} loaded but has no datasets")
+            return None
+    except ValueError as e:
+        error_msg = str(e)
+        if "does not exist" in error_msg or "Offline mode" in error_msg:
+            # Extract the expected folder name from the error if possible
+            import re
+            match = re.search(r'/([^/]+-bdf)', error_msg)
+            if match:
+                expected_folder = match.group(1)
+                actual_folders = [f.name for f in bdf_folders]
+                print(f"   ❌ EEGChallengeDataset expects folder: {expected_folder}")
+                print(f"   But found folders: {actual_folders}")
+                if expected_folder not in actual_folders:
+                    print(f"   💡 Folder name mismatch - the dataset may not be available for this release")
+            else:
+                print(f"   ❌ {error_msg[:200]}")
+        else:
+            print(f"   ❌ {error_msg[:200]}")
+        return None
+    except Exception as e:
+        print(f"⚠️  Failed to load Release {release_id}: {str(e)[:200]}")
+        return None
 
 
 def preprocess_and_window_dataset(dataset, release_id):
