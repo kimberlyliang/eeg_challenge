@@ -1772,31 +1772,31 @@ if not TESTING_MODE_ONLY:
     model_name = 'DANN'
     found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
     if found:
-    print(f"✅ Found existing {model_name} in {source_dir}")
-    print(f"   Skipping training. Model will be copied to current results directory.")
-    copy_model_to_current_dir(existing_path, model_name, source_dir)
-    try:
-        checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
-        if os.path.exists(checkpoint_path):
-            checkpoint = torch.load(checkpoint_path, map_location='cpu')
-            best_rmse = checkpoint.get('best_rmse', None)
-            best_epoch = checkpoint.get('best_epoch', None)
-            val_history = checkpoint.get('val_history', {})
-            if best_rmse is not None:
-                results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
-                print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+        print(f"✅ Found existing {model_name} in {source_dir}")
+        print(f"   Skipping training. Model will be copied to current results directory.")
+        copy_model_to_current_dir(existing_path, model_name, source_dir)
+        try:
+            checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
+            if os.path.exists(checkpoint_path):
+                checkpoint = torch.load(checkpoint_path, map_location='cpu')
+                best_rmse = checkpoint.get('best_rmse', None)
+                best_epoch = checkpoint.get('best_epoch', None)
+                val_history = checkpoint.get('val_history', {})
+                if best_rmse is not None:
+                    results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
+                    print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+                else:
+                    results[model_name] = (None, None, {}, {})
             else:
                 results[model_name] = (None, None, {}, {})
-        else:
+        except Exception as e:
+            print(f"   ⚠️  Could not load checkpoint: {e}")
             results[model_name] = (None, None, {}, {})
-    except Exception as e:
-        print(f"   ⚠️  Could not load checkpoint: {e}")
-        results[model_name] = (None, None, {}, {})
-else:
-    dann_model = DANN(n_chans=n_chans, n_times=n_times, n_domains=n_domains, feature_dim=feature_dim)
-    results['DANN'] = train_neural_network(
-        dann_model, train_loader, val_loader, 'DANN', return_domain=False
-    )
+    else:
+        dann_model = DANN(n_chans=n_chans, n_times=n_times, n_domains=n_domains, feature_dim=feature_dim)
+        results['DANN'] = train_neural_network(
+            dann_model, train_loader, val_loader, 'DANN', return_domain=False
+        )
 else:
     print("   ⏭️  DANN training skipped (testing mode)")
 
@@ -1805,31 +1805,31 @@ if not TESTING_MODE_ONLY:
     model_name = 'DANNModel'
     found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
     if found:
-    print(f"✅ Found existing {model_name} in {source_dir}")
-    print(f"   Skipping training. Model will be copied to current results directory.")
-    copy_model_to_current_dir(existing_path, model_name, source_dir)
-    try:
-        checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
-        if os.path.exists(checkpoint_path):
-            checkpoint = torch.load(checkpoint_path, map_location='cpu')
-            best_rmse = checkpoint.get('best_rmse', None)
-            best_epoch = checkpoint.get('best_epoch', None)
-            val_history = checkpoint.get('val_history', {})
-            if best_rmse is not None:
-                results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
-                print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+        print(f"✅ Found existing {model_name} in {source_dir}")
+        print(f"   Skipping training. Model will be copied to current results directory.")
+        copy_model_to_current_dir(existing_path, model_name, source_dir)
+        try:
+            checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
+            if os.path.exists(checkpoint_path):
+                checkpoint = torch.load(checkpoint_path, map_location='cpu')
+                best_rmse = checkpoint.get('best_rmse', None)
+                best_epoch = checkpoint.get('best_epoch', None)
+                val_history = checkpoint.get('val_history', {})
+                if best_rmse is not None:
+                    results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
+                    print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+                else:
+                    results[model_name] = (None, None, {}, {})
             else:
                 results[model_name] = (None, None, {}, {})
-        else:
+        except Exception as e:
+            print(f"   ⚠️  Could not load checkpoint: {e}")
             results[model_name] = (None, None, {}, {})
-    except Exception as e:
-        print(f"   ⚠️  Could not load checkpoint: {e}")
-        results[model_name] = (None, None, {}, {})
-else:
-    dannmodel_model = DANNModel(n_chans=n_chans, n_times=n_times, n_domains=n_domains)
-    results['DANNModel'] = train_neural_network(
-        dannmodel_model, train_loader, val_loader, 'DANNModel', return_domain=False
-    )
+    else:
+        dannmodel_model = DANNModel(n_chans=n_chans, n_times=n_times, n_domains=n_domains)
+        results['DANNModel'] = train_neural_network(
+            dannmodel_model, train_loader, val_loader, 'DANNModel', return_domain=False
+        )
 else:
     print("   ⏭️  DANNModel training skipped (testing mode)")
 
@@ -1838,33 +1838,33 @@ if not TESTING_MODE_ONLY:
     model_name = 'CNNTransformerDANN'
     found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
     if found:
-    print(f"✅ Found existing {model_name} in {source_dir}")
-    print(f"   Skipping training. Model will be copied to current results directory.")
-    copy_model_to_current_dir(existing_path, model_name, source_dir)
-    try:
-        checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
-        if os.path.exists(checkpoint_path):
-            checkpoint = torch.load(checkpoint_path, map_location='cpu')
-            best_rmse = checkpoint.get('best_rmse', None)
-            best_epoch = checkpoint.get('best_epoch', None)
-            val_history = checkpoint.get('val_history', {})
-            if best_rmse is not None:
-                results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
-                print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+        print(f"✅ Found existing {model_name} in {source_dir}")
+        print(f"   Skipping training. Model will be copied to current results directory.")
+        copy_model_to_current_dir(existing_path, model_name, source_dir)
+        try:
+            checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
+            if os.path.exists(checkpoint_path):
+                checkpoint = torch.load(checkpoint_path, map_location='cpu')
+                best_rmse = checkpoint.get('best_rmse', None)
+                best_epoch = checkpoint.get('best_epoch', None)
+                val_history = checkpoint.get('val_history', {})
+                if best_rmse is not None:
+                    results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
+                    print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+                else:
+                    results[model_name] = (None, None, {}, {})
             else:
                 results[model_name] = (None, None, {}, {})
-        else:
+        except Exception as e:
+            print(f"   ⚠️  Could not load checkpoint: {e}")
             results[model_name] = (None, None, {}, {})
-    except Exception as e:
-        print(f"   ⚠️  Could not load checkpoint: {e}")
-        results[model_name] = (None, None, {}, {})
-else:
-    cnn_trans_dann_model = CNNTransformerDANN(
-        n_chans=n_chans, n_times=n_times, n_domains=n_domains, feature_dim=feature_dim
-    )
-    results['CNNTransformerDANN'] = train_neural_network(
-        cnn_trans_dann_model, train_loader, val_loader, 'CNNTransformerDANN', return_domain=False
-    )
+    else:
+        cnn_trans_dann_model = CNNTransformerDANN(
+            n_chans=n_chans, n_times=n_times, n_domains=n_domains, feature_dim=feature_dim
+        )
+        results['CNNTransformerDANN'] = train_neural_network(
+            cnn_trans_dann_model, train_loader, val_loader, 'CNNTransformerDANN', return_domain=False
+        )
 else:
     print("   ⏭️  CNNTransformerDANN training skipped (testing mode)")
 
@@ -1874,34 +1874,34 @@ if not TESTING_MODE_ONLY:
     model_name = 'Labram'
     found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
     if found:
-    print(f"✅ Found existing {model_name} in {source_dir}")
-    print(f"   Skipping training. Model will be copied to current results directory.")
-    copy_model_to_current_dir(existing_path, model_name, source_dir)
-    try:
-        checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
-        if os.path.exists(checkpoint_path):
-            checkpoint = torch.load(checkpoint_path, map_location='cpu')
-            best_rmse = checkpoint.get('best_rmse', None)
-            best_epoch = checkpoint.get('best_epoch', None)
-            val_history = checkpoint.get('val_history', {})
-            if best_rmse is not None:
-                results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
-                print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+        print(f"✅ Found existing {model_name} in {source_dir}")
+        print(f"   Skipping training. Model will be copied to current results directory.")
+        copy_model_to_current_dir(existing_path, model_name, source_dir)
+        try:
+            checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
+            if os.path.exists(checkpoint_path):
+                checkpoint = torch.load(checkpoint_path, map_location='cpu')
+                best_rmse = checkpoint.get('best_rmse', None)
+                best_epoch = checkpoint.get('best_epoch', None)
+                val_history = checkpoint.get('val_history', {})
+                if best_rmse is not None:
+                    results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
+                    print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+                else:
+                    results[model_name] = (None, None, {}, {})
             else:
                 results[model_name] = (None, None, {}, {})
-        else:
+        except Exception as e:
+            print(f"   ⚠️  Could not load checkpoint: {e}")
             results[model_name] = (None, None, {}, {})
-    except Exception as e:
-        print(f"   ⚠️  Could not load checkpoint: {e}")
-        results[model_name] = (None, None, {}, {})
-else:
-    try:
-        labram_model = Labram(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
-        results['Labram'] = train_neural_network(
-            labram_model, train_loader, val_loader, 'Labram'
-        )
-    except Exception as e:
-        print(f"⚠️  Could not train Labram: {e}")
+    else:
+        try:
+            labram_model = Labram(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
+            results['Labram'] = train_neural_network(
+                labram_model, train_loader, val_loader, 'Labram'
+            )
+        except Exception as e:
+            print(f"⚠️  Could not train Labram: {e}")
 else:
     print("   ⏭️  Labram training skipped (testing mode)")
 
