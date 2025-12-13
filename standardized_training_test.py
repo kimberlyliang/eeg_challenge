@@ -267,49 +267,50 @@ def load_release(release_id, task="contrastChangeDetection"):
                                     print(f"   ✅ Symlink verified: {expected_folder_path} -> {expected_folder_path.readlink()}")
                                 else:
                                     print(f"   ⚠️  Warning: Symlink created but path doesn't exist")
-                        elif expected_folder_path.exists() and expected_folder_path.is_symlink():
-                            print(f"   ✅ Symlink already exists: {expected_folder_path} -> {expected_folder_path.readlink()}")
-                                
-                                # Try loading again with the symlink in place
-                                print(f"   🔄 Attempting to load dataset with symlink in place...")
-                                print(f"   ⏳ This may take a while as EEGChallengeDataset scans files...")
-                                logger.info(f"Attempting to load Release R{release_id} with symlink workaround")
-                                for handler in logger.handlers:
-                                    handler.flush()
-                                try:
-                                    print(f"   📦 Creating EEGChallengeDataset object...")
-                                    dataset = EEGChallengeDataset(
-                                        task=task,
-                                        release=f"R{release_id}",
-                                        cache_dir=release_dir,
-                                        mini=False,
-                                        download=False
-                                    )
-                                    print(f"   ✅ EEGChallengeDataset object created")
-                                    logger.info("EEGChallengeDataset object created successfully")
-                                    for handler in logger.handlers:
-                                        handler.flush()
-                                    print(f"   ✅ Dataset object created, checking recordings...")
-                                    if len(dataset.datasets) > 0:
-                                        print(f"✅ Loaded {len(dataset.datasets)} recordings from Release R{release_id} (using symlink workaround)")
-                                        logger.info(f"Successfully loaded Release R{release_id} using symlink workaround: {len(dataset.datasets)} recordings")
-                                        return dataset
-                                    else:
-                                        print(f"   ⚠️  Dataset loaded but has no recordings")
-                                except Exception as e2:
-                                    # Clean up symlink if it was created
-                                    try:
-                                        if expected_folder_path.is_symlink():
-                                            expected_folder_path.unlink()
-                                            print(f"   🧹 Cleaned up symlink")
-                                    except:
-                                        pass
-                                    print(f"   ❌ Symlink workaround failed: {str(e2)}")
-                                    import traceback
-                                    traceback.print_exc()
-                                    logger.error(f"Symlink workaround failed: {str(e2)}")
                             except (OSError, PermissionError) as symlink_err:
                                 print(f"   ⚠️  Could not create symlink (may need permissions): {str(symlink_err)[:200]}")
+                        elif expected_folder_path.exists() and expected_folder_path.is_symlink():
+                            print(f"   ✅ Symlink already exists: {expected_folder_path} -> {expected_folder_path.readlink()}")
+                        
+                        # Try loading again with the symlink in place (if it exists now)
+                        if expected_folder_path.exists():
+                            print(f"   🔄 Attempting to load dataset with symlink in place...")
+                            print(f"   ⏳ This may take a while as EEGChallengeDataset scans files...")
+                            logger.info(f"Attempting to load Release R{release_id} with symlink workaround")
+                            for handler in logger.handlers:
+                                handler.flush()
+                            try:
+                                print(f"   📦 Creating EEGChallengeDataset object...")
+                                dataset = EEGChallengeDataset(
+                                    task=task,
+                                    release=f"R{release_id}",
+                                    cache_dir=release_dir,
+                                    mini=False,
+                                    download=False
+                                )
+                                print(f"   ✅ EEGChallengeDataset object created")
+                                logger.info("EEGChallengeDataset object created successfully")
+                                for handler in logger.handlers:
+                                    handler.flush()
+                                print(f"   ✅ Dataset object created, checking recordings...")
+                                if len(dataset.datasets) > 0:
+                                    print(f"✅ Loaded {len(dataset.datasets)} recordings from Release R{release_id} (using symlink workaround)")
+                                    logger.info(f"Successfully loaded Release R{release_id} using symlink workaround: {len(dataset.datasets)} recordings")
+                                    return dataset
+                                else:
+                                    print(f"   ⚠️  Dataset loaded but has no recordings")
+                            except Exception as e2:
+                                # Clean up symlink if it was created
+                                try:
+                                    if expected_folder_path.is_symlink():
+                                        expected_folder_path.unlink()
+                                        print(f"   🧹 Cleaned up symlink")
+                                except:
+                                    pass
+                                print(f"   ❌ Symlink workaround failed: {str(e2)}")
+                                import traceback
+                                traceback.print_exc()
+                                logger.error(f"Symlink workaround failed: {str(e2)}")
                     except Exception as symlink_error:
                         print(f"   ⚠️  Symlink creation error: {str(symlink_error)[:200]}")
                     
