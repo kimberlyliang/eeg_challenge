@@ -93,7 +93,7 @@ print("=" * 70)
 print("Loading Dataset")
 print("=" * 70)
 
-data_dir = Path("data")
+data_dir = Path("data_new_new")
 available_releases = []
 
 if data_dir.exists():
