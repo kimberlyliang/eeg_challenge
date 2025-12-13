@@ -133,34 +133,44 @@ logging.basicConfig(
     handlers=[
         logging.FileHandler(log_file),
         logging.StreamHandler()  # Also print to console
-    ]
+    ],
+    force=True  # Force reconfiguration
 )
 logger = logging.getLogger(__name__)
 logger.info("=" * 70)
 logger.info("TESTING MODE - Test Results Log")
+logger.info(f"Results directory: {RESULTS_DIR}")
 logger.info("=" * 70)
+# Force flush to ensure log is written immediately
+for handler in logger.handlers:
+    handler.flush()
 
-# Automatically discover all previous result directories
+# Use only specific result directories
 print("\n" + "=" * 70)
-print("DISCOVERING ALL PREVIOUS RESULT DIRECTORIES")
+print("USING SPECIFIED RESULT DIRECTORIES")
 print("=" * 70)
 
-# Find all directories matching the pattern "standardized_results_*"
-current_dir = Path(".")
-all_result_dirs = sorted([d.name for d in current_dir.iterdir() 
-                         if d.is_dir() and d.name.startswith("standardized_results_")])
+# Only use these two directories
+PREVIOUS_RESULT_DIRS = [
+    "standardized_results_20251205_204816",
+    "standardized_results_20251212_130126"
+]
 
-# Exclude the current results directory
-PREVIOUS_RESULT_DIRS = [d for d in all_result_dirs if d != RESULTS_DIR]
+# Verify directories exist
+existing_dirs = []
+for dir_name in PREVIOUS_RESULT_DIRS:
+    if Path(dir_name).exists():
+        existing_dirs.append(dir_name)
+        print(f"  ✅ {dir_name}")
+    else:
+        print(f"  ⚠️  {dir_name} (not found)")
 
-print(f"Found {len(PREVIOUS_RESULT_DIRS)} previous result directory(ies):")
-for i, dir_name in enumerate(PREVIOUS_RESULT_DIRS, 1):
-    print(f"  {i:2d}. {dir_name}")
+PREVIOUS_RESULT_DIRS = existing_dirs
 
 if len(PREVIOUS_RESULT_DIRS) == 0:
-    print("  ⚠️  No previous result directories found. Will only use current directory.")
+    print("  ❌ No specified directories found. Will only use current directory.")
 else:
-    print(f"\n✅ Will scan all {len(PREVIOUS_RESULT_DIRS)} directories for existing models.")
+    print(f"\n✅ Will scan {len(PREVIOUS_RESULT_DIRS)} directory(ies) for existing models.")
 print("=" * 70)
 
 print(f"\n📁 Results will be saved to: {RESULTS_DIR}/")
@@ -245,11 +255,29 @@ def load_release(release_id, task="contrastChangeDetection"):
                         if not expected_folder_path.exists() and actual_folder_path.exists():
                             # Create symlink from expected name to actual folder
                             print(f"   🔗 Creating symlink: {expected_folder} -> {actual_folder}")
+                            print(f"   💡 TIP: If this hangs, you can create the symlink manually:")
+                            print(f"      cd {release_dir}")
+                            print(f"      ln -s {actual_folder} {expected_folder}")
                             try:
                                 expected_folder_path.symlink_to(actual_folder, target_is_directory=True)
+                                print(f"   ✅ Symlink created successfully")
+                                
+                                # Verify symlink exists
+                                if expected_folder_path.exists():
+                                    print(f"   ✅ Symlink verified: {expected_folder_path} -> {expected_folder_path.readlink()}")
+                                else:
+                                    print(f"   ⚠️  Warning: Symlink created but path doesn't exist")
+                        elif expected_folder_path.exists() and expected_folder_path.is_symlink():
+                            print(f"   ✅ Symlink already exists: {expected_folder_path} -> {expected_folder_path.readlink()}")
                                 
                                 # Try loading again with the symlink in place
+                                print(f"   🔄 Attempting to load dataset with symlink in place...")
+                                print(f"   ⏳ This may take a while as EEGChallengeDataset scans files...")
+                                logger.info(f"Attempting to load Release R{release_id} with symlink workaround")
+                                for handler in logger.handlers:
+                                    handler.flush()
                                 try:
+                                    print(f"   📦 Creating EEGChallengeDataset object...")
                                     dataset = EEGChallengeDataset(
                                         task=task,
                                         release=f"R{release_id}",
@@ -257,17 +285,29 @@ def load_release(release_id, task="contrastChangeDetection"):
                                         mini=False,
                                         download=False
                                     )
+                                    print(f"   ✅ EEGChallengeDataset object created")
+                                    logger.info("EEGChallengeDataset object created successfully")
+                                    for handler in logger.handlers:
+                                        handler.flush()
+                                    print(f"   ✅ Dataset object created, checking recordings...")
                                     if len(dataset.datasets) > 0:
                                         print(f"✅ Loaded {len(dataset.datasets)} recordings from Release R{release_id} (using symlink workaround)")
+                                        logger.info(f"Successfully loaded Release R{release_id} using symlink workaround: {len(dataset.datasets)} recordings")
                                         return dataset
+                                    else:
+                                        print(f"   ⚠️  Dataset loaded but has no recordings")
                                 except Exception as e2:
                                     # Clean up symlink if it was created
                                     try:
                                         if expected_folder_path.is_symlink():
                                             expected_folder_path.unlink()
+                                            print(f"   🧹 Cleaned up symlink")
                                     except:
                                         pass
-                                    print(f"   ⚠️  Symlink workaround failed: {str(e2)[:200]}")
+                                    print(f"   ❌ Symlink workaround failed: {str(e2)}")
+                                    import traceback
+                                    traceback.print_exc()
+                                    logger.error(f"Symlink workaround failed: {str(e2)}")
                             except (OSError, PermissionError) as symlink_err:
                                 print(f"   ⚠️  Could not create symlink (may need permissions): {str(symlink_err)[:200]}")
                     except Exception as symlink_error:
@@ -287,8 +327,11 @@ def load_release(release_id, task="contrastChangeDetection"):
 def preprocess_and_window_dataset(dataset, release_id):
     """Preprocess and create windows for a dataset"""
     print(f"\n📊 Preprocessing Release {release_id}...")
+    logger.info(f"Starting preprocessing for Release {release_id}")
     
     # Preprocessing
+    print("   Step 1/3: Annotating trials with targets...")
+    logger.info("Step 1/3: Annotating trials with targets")
     transformation_offline = [
         Preprocessor(
             annotate_trials_with_target,
@@ -302,12 +345,22 @@ def preprocess_and_window_dataset(dataset, release_id):
     ]
     # Use n_jobs=1 and ensure we're not triggering downloads during preprocessing
     # The dataset should already be loaded with download=False
+    print("   Step 2/3: Running preprocessing (this may take a while)...")
+    logger.info("Step 2/3: Running preprocessing")
     preprocess(dataset, transformation_offline, n_jobs=1)
+    print("   ✅ Preprocessing complete")
+    logger.info("Preprocessing complete")
     
     # Keep only recordings with stimulus anchors
+    print("   Step 3/3: Filtering and creating windows...")
+    logger.info("Step 3/3: Filtering and creating windows")
     dataset_filtered = keep_only_recordings_with(ANCHOR, dataset)
+    print(f"   Filtered to {len(dataset_filtered.datasets)} recordings with stimulus anchors")
+    logger.info(f"Filtered to {len(dataset_filtered.datasets)} recordings with stimulus anchors")
     
     # Create windows
+    print("   Creating windows (preloading data - this may take a while)...")
+    logger.info("Creating windows with preload=True")
     single_windows = create_windows_from_events(
         dataset_filtered,
         mapping={ANCHOR: 0},
@@ -317,6 +370,8 @@ def preprocess_and_window_dataset(dataset, release_id):
         window_stride_samples=SFREQ,
         preload=True,
     )
+    print("   ✅ Windows created")
+    logger.info(f"Windows created: {len(single_windows)} windows")
     
     # Add metadata
     single_windows = add_extras_columns(
@@ -344,6 +399,9 @@ val_loader = None
 
 # Load test release
 print(f"\n📥 Loading TEST release: {TEST_RELEASE}")
+logger.info(f"Starting to load TEST release: {TEST_RELEASE}")
+for handler in logger.handlers:
+    handler.flush()
 test_dataset = load_release(TEST_RELEASE)
 if test_dataset is None:
     print(f"\n❌ ERROR: Test release {TEST_RELEASE} could not be loaded!")
