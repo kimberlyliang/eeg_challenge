@@ -51,6 +51,7 @@ import json
 import matplotlib.pyplot as plt
 from datetime import datetime
 from collections import defaultdict
+import logging
 
 # Suppress expected warnings during feature extraction
 # (precision loss in skew/kurtosis is expected when data has low variance)
@@ -123,6 +124,21 @@ TESTING_MODE_ONLY = True
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
 RESULTS_DIR = f"standardized_results_{TIMESTAMP}"
 os.makedirs(RESULTS_DIR, exist_ok=True)
+
+# Set up logging
+log_file = os.path.join(RESULTS_DIR, "test_results.log")
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_file),
+        logging.StreamHandler()  # Also print to console
+    ]
+)
+logger = logging.getLogger(__name__)
+logger.info("=" * 70)
+logger.info("TESTING MODE - Test Results Log")
+logger.info("=" * 70)
 
 # Automatically discover all previous result directories
 print("\n" + "=" * 70)
@@ -215,7 +231,48 @@ def load_release(release_id, task="contrastChangeDetection"):
                 actual_folders = [f.name for f in bdf_folders]
                 print(f"   ❌ EEGChallengeDataset expects folder: {expected_folder}")
                 print(f"   But found folders: {actual_folders}")
-                if expected_folder not in actual_folders:
+                if expected_folder not in actual_folders and len(actual_folders) > 0:
+                    # Try using the actual folder that exists by creating a symlink or trying alternative approach
+                    print(f"   💡 Attempting to work around folder name mismatch...")
+                    actual_folder = actual_folders[0]
+                    actual_folder_path = release_dir / actual_folder
+                    
+                    # Try creating a symlink to the expected folder name
+                    try:
+                        expected_folder_path = release_dir / expected_folder
+                        actual_folder_path = release_dir / actual_folder
+                        
+                        if not expected_folder_path.exists() and actual_folder_path.exists():
+                            # Create symlink from expected name to actual folder
+                            print(f"   🔗 Creating symlink: {expected_folder} -> {actual_folder}")
+                            try:
+                                expected_folder_path.symlink_to(actual_folder, target_is_directory=True)
+                                
+                                # Try loading again with the symlink in place
+                                try:
+                                    dataset = EEGChallengeDataset(
+                                        task=task,
+                                        release=f"R{release_id}",
+                                        cache_dir=release_dir,
+                                        mini=False,
+                                        download=False
+                                    )
+                                    if len(dataset.datasets) > 0:
+                                        print(f"✅ Loaded {len(dataset.datasets)} recordings from Release R{release_id} (using symlink workaround)")
+                                        return dataset
+                                except Exception as e2:
+                                    # Clean up symlink if it was created
+                                    try:
+                                        if expected_folder_path.is_symlink():
+                                            expected_folder_path.unlink()
+                                    except:
+                                        pass
+                                    print(f"   ⚠️  Symlink workaround failed: {str(e2)[:200]}")
+                            except (OSError, PermissionError) as symlink_err:
+                                print(f"   ⚠️  Could not create symlink (may need permissions): {str(symlink_err)[:200]}")
+                    except Exception as symlink_error:
+                        print(f"   ⚠️  Symlink creation error: {str(symlink_error)[:200]}")
+                    
                     print(f"   💡 Folder name mismatch - the dataset may not be available for this release")
             else:
                 print(f"   ❌ {error_msg[:200]}")
@@ -289,6 +346,13 @@ val_loader = None
 print(f"\n📥 Loading TEST release: {TEST_RELEASE}")
 test_dataset = load_release(TEST_RELEASE)
 if test_dataset is None:
+    print(f"\n❌ ERROR: Test release {TEST_RELEASE} could not be loaded!")
+    print(f"   This is required for testing models.")
+    print(f"   Possible solutions:")
+    print(f"   1. Check if the folder name matches what EEGChallengeDataset expects")
+    print(f"   2. Verify the data exists in data_new_new/release_{TEST_RELEASE}/")
+    print(f"   3. Check if you need to rename the folder to match expected name")
+    print(f"\n   Script will exit since test data is required.")
     raise ValueError(f"Test release {TEST_RELEASE} is required but could not be loaded!")
 
 test_windows = preprocess_and_window_dataset(test_dataset, TEST_RELEASE)
@@ -2045,6 +2109,7 @@ def test_all_models_from_directories(result_dirs, test_loader, n_chans, n_times,
                         }
                         models_found.add(model_name)
                         print(f"   ✅ {model_name}: RMSE={test_rmse:.4f}, NRMSE={test_nrmse:.4f}")
+                        logger.info(f"{model_name} ({result_dir}): RMSE={test_rmse:.4f}, NRMSE={test_nrmse:.4f}")
                     except Exception as e:
                         print(f"   ❌ Error testing {model_name}: {e}")
                     continue
@@ -2097,6 +2162,7 @@ def test_all_models_from_directories(result_dirs, test_loader, n_chans, n_times,
                 }
                 models_found.add(model_name)
                 print(f"      ✅ RMSE={test_rmse:.4f}, NRMSE={test_nrmse:.4f}")
+                logger.info(f"{model_name} ({result_dir}): RMSE={test_rmse:.4f}, NRMSE={test_nrmse:.4f}")
                 
             except Exception as e:
                 print(f"      ❌ Error testing {model_name}: {e}")
@@ -2263,6 +2329,7 @@ if test_loader is not None:
                 'source': 'current' if os.path.exists(os.path.join(RESULTS_DIR, f"{model_name}_best.pt")) else source_dir
             }
             print(f"  ✅ Test RMSE: {test_rmse:.4f} | Test NRMSE: {test_nrmse:.4f}")
+            logger.info(f"{model_name}: RMSE={test_rmse:.4f}, NRMSE={test_nrmse:.4f}")
         except Exception as e:
             print(f"  ❌ Error testing {model_name}: {e}")
             import traceback
@@ -2332,6 +2399,7 @@ if test_loader is not None:
                     'source': 'current' if os.path.exists(os.path.join(RESULTS_DIR, f"{model_name}_best.pt")) else source_dir
                 }
                 print(f"  ✅ Test RMSE: {test_rmse:.4f} | Test NRMSE: {test_nrmse:.4f}")
+                logger.info(f"{model_name}: RMSE={test_rmse:.4f}, NRMSE={test_nrmse:.4f}")
             except Exception as e:
                 print(f"  ❌ Error testing {model_name}: {e}")
                 import traceback
@@ -2443,11 +2511,17 @@ for model_name, result in summary['validation_results'].items():
 
 if 'test_results' in summary and summary['test_results']:
     print("\nTest Results (Release 11):")
+    logger.info("\n" + "=" * 70)
+    logger.info("FINAL TEST RESULTS SUMMARY (Release 11)")
+    logger.info("=" * 70)
     for model_name, test_result in summary['test_results'].items():
         if isinstance(test_result, dict):
             print(f"  {model_name:20s}: RMSE = {test_result['rmse']:.4f} | NRMSE = {test_result['nrmse']:.4f}")
+            logger.info(f"{model_name:20s}: RMSE = {test_result['rmse']:.4f} | NRMSE = {test_result['nrmse']:.4f}")
         else:
             print(f"  {model_name:20s}: RMSE = {test_result:.4f}")
+            logger.info(f"{model_name:20s}: RMSE = {test_result:.4f}")
+    logger.info("=" * 70)
 
 print(f"\n✅ All results saved to: {RESULTS_DIR}/")
 print("=" * 70)
