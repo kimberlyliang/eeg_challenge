@@ -118,6 +118,29 @@ TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
 RESULTS_DIR = f"standardized_results_{TIMESTAMP}"
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
+# Automatically discover all previous result directories
+print("\n" + "=" * 70)
+print("DISCOVERING ALL PREVIOUS RESULT DIRECTORIES")
+print("=" * 70)
+
+# Find all directories matching the pattern "standardized_results_*"
+current_dir = Path(".")
+all_result_dirs = sorted([d.name for d in current_dir.iterdir() 
+                         if d.is_dir() and d.name.startswith("standardized_results_")])
+
+# Exclude the current results directory
+PREVIOUS_RESULT_DIRS = [d for d in all_result_dirs if d != RESULTS_DIR]
+
+print(f"Found {len(PREVIOUS_RESULT_DIRS)} previous result directory(ies):")
+for i, dir_name in enumerate(PREVIOUS_RESULT_DIRS, 1):
+    print(f"  {i:2d}. {dir_name}")
+
+if len(PREVIOUS_RESULT_DIRS) == 0:
+    print("  ⚠️  No previous result directories found. Will only use current directory.")
+else:
+    print(f"\n✅ Will scan all {len(PREVIOUS_RESULT_DIRS)} directories for existing models.")
+print("=" * 70)
+
 print(f"\n📁 Results will be saved to: {RESULTS_DIR}/")
 print("=" * 70)
 print("STANDARDIZED DATA SPLIT:")
@@ -299,8 +322,128 @@ print(f"\n📐 Detected input shape: n_chans={n_chans}, n_times={n_times}")
 # ============================================================
 # 2. FEATURE EXTRACTION FOR LINEAR/TREE MODELS
 # ============================================================
-# NOTE: Feature extraction is disabled since linear/tree models are commented out
-# The feature extraction functions and calls have been removed to avoid errors
+# NOTE: Feature extraction is commented out since linear/tree models are disabled
+# Uncomment this section if you want to train linear/tree models
+
+# def extract_features_from_window(window_np, fs=100.0):
+#     """
+#     Extract features from EEG window (same as submission_5/submission.py)
+#     Returns: feature vector of length 1161 (129 channels * 9 features per channel)
+#     """
+#     import warnings
+#     from scipy.signal import welch
+#     from scipy.stats import skew, kurtosis
+#     
+#     def bandpower(data, fs, fmin, fmax):
+#         """Compute bandpower using Welch's method"""
+#         f, Pxx = welch(data, fs=fs, nperseg=min(256, len(data)), nfft=1024)
+#         band = (f >= fmin) & (f <= fmax)
+#         # Use trapezoid instead of deprecated trapz
+#         return np.trapezoid(Pxx[band], f[band])
+#     
+#     # Basic stats
+#     means = window_np.mean(axis=1)
+#     stds = window_np.std(axis=1) + 1e-8
+#     
+#     # Suppress warnings for skew/kurtosis when data has low variance (expected)
+#     with warnings.catch_warnings():
+#         warnings.filterwarnings('ignore', category=RuntimeWarning, 
+#                                 message='.*Precision loss.*|.*invalid value.*|.*divide by zero.*')
+#         skews = skew(window_np, axis=1, bias=False, nan_policy='omit')
+#         kurts = kurtosis(window_np, axis=1, fisher=True, bias=False, nan_policy='omit')
+#     
+#     # Frequency bands
+#     bands = {
+#         "delta": (1, 4),
+#         "theta": (4, 8),
+#         "alpha": (8, 13),
+#         "beta": (13, 30),
+#         "gamma": (30, 50)
+#     }
+#     
+#     # Bandpower for each channel
+#     band_feats = []
+#     for ch in range(window_np.shape[0]):
+#         ch_data = window_np[ch, :]
+#         ch_bandpowers = [bandpower(ch_data, fs, fmin, fmax) for fmin, fmax in bands.values()]
+#         band_feats.append(ch_bandpowers)
+#     band_feats = np.array(band_feats)
+#     
+#     # Combine: mean, std, skew, kurt, 5 bandpowers = 9 features per channel
+#     feats = np.concatenate([
+#         means[:, None],
+#         stds[:, None],
+#         skews[:, None],
+#         kurts[:, None],
+#         band_feats
+#     ], axis=1).reshape(-1)
+#     
+#     feats = np.nan_to_num(feats, nan=0.0, posinf=0.0, neginf=0.0)
+#     return feats
+#
+#
+# def extract_features_from_dataset(windows):
+#     """Extract features from all windows in dataset"""
+#     import warnings
+#     print("🔧 Extracting features from dataset...")
+#     features = []
+#     targets = []
+#     
+#     # Suppress deprecation warnings for array-to-scalar conversion
+#     warnings.filterwarnings('ignore', category=DeprecationWarning, 
+#                           message='.*Conversion of an array.*')
+#     
+#     for i in tqdm(range(len(windows)), desc="Extracting features"):
+#         window_data = windows[i][0]  # (n_chans, n_times)
+#         target = windows[i][1]  # scalar or array
+#         
+#         # Convert to numpy if needed
+#         if isinstance(window_data, torch.Tensor):
+#             window_np = window_data.numpy()
+#         else:
+#             window_np = np.array(window_data)
+#         
+#         feat = extract_features_from_window(window_np, fs=SFREQ)
+#         features.append(feat)
+#         
+#         # Handle target conversion properly (handle both scalar and array cases)
+#         if isinstance(target, (np.ndarray, torch.Tensor)):
+#             if isinstance(target, torch.Tensor):
+#                 target = target.item() if target.numel() == 1 else float(target.flatten()[0])
+#             else:
+#                 target = target.item() if target.size == 1 else float(target.flatten()[0])
+#         else:
+#             target = float(target)
+#         targets.append(target)
+#     
+#     return np.array(features), np.array(targets)
+
+
+# Extract features for linear/tree models
+# NOTE: Commented out since linear/tree models are disabled
+# print("\n" + "=" * 70)
+# print("EXTRACTING FEATURES FOR LINEAR/TREE MODELS")
+# print("=" * 70)
+
+# X_train, y_train = extract_features_from_dataset(train_windows)
+# X_val, y_val = extract_features_from_dataset(val_windows)
+# if test_windows is not None:
+#     X_test, y_test = extract_features_from_dataset(test_windows)
+# else:
+#     X_test, y_test = None, None
+
+# print(f"✅ Training features: {X_train.shape}")
+# print(f"✅ Validation features: {X_val.shape}")
+# if X_test is not None:
+#     print(f"✅ Test features: {X_test.shape}")
+
+# Scale features
+# NOTE: Scaler initialization commented out since linear/tree models are disabled
+# scaler = StandardScaler()
+# X_train_scaled = scaler.fit_transform(X_train)
+# X_val_scaled = scaler.transform(X_val)
+# if X_test is not None:
+#     X_test_scaled = scaler.transform(X_test)
 
 # ============================================================
 # 3. MODEL DEFINITIONS
@@ -1342,10 +1485,36 @@ print("\n--- Hybrid Models ---")
 #     cnn_trans_model, train_loader, val_loader, 'CNN_Transformer'
 # )
 
-hybrid_model = HybridEEGRegressor(n_chans=n_chans, n_times=n_times, dropout=0.3)
-results['HybridEEGRegressor'] = train_neural_network(
-    hybrid_model, train_loader, val_loader, 'HybridEEGRegressor'
-)
+# Check if HybridEEGRegressor already exists
+model_name = 'HybridEEGRegressor'
+found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
+if found:
+    print(f"✅ Found existing {model_name} in {source_dir}")
+    print(f"   Skipping training. Model will be copied to current results directory.")
+    copy_model_to_current_dir(existing_path, model_name, source_dir)
+    # Load the model to get validation results if available
+    try:
+        checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
+        if os.path.exists(checkpoint_path):
+            checkpoint = torch.load(checkpoint_path, map_location='cpu')
+            best_rmse = checkpoint.get('best_rmse', None)
+            best_epoch = checkpoint.get('best_epoch', None)
+            val_history = checkpoint.get('val_history', {})
+            if best_rmse is not None:
+                results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
+                print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+            else:
+                results[model_name] = (None, None, {}, {})
+        else:
+            results[model_name] = (None, None, {}, {})
+    except Exception as e:
+        print(f"   ⚠️  Could not load checkpoint: {e}")
+        results[model_name] = (None, None, {}, {})
+else:
+    hybrid_model = HybridEEGRegressor(n_chans=n_chans, n_times=n_times, dropout=0.3)
+    results['HybridEEGRegressor'] = train_neural_network(
+        hybrid_model, train_loader, val_loader, 'HybridEEGRegressor'
+    )
 
 # GNN Models (requires graph construction)
 if HAS_PYG:
@@ -1531,13 +1700,39 @@ if HAS_PYG:
         
         return best_rmse, best_epoch, train_history, val_history
     
-    dualbranch_model = DualBranchEEGModel(
-        n_channels=128, n_times=n_times, dropout=0.3, use_gat=False
-    )
-    results['DualBranchEEGModel'] = train_gnn_model(
-        dualbranch_model, train_loader, val_loader, 'DualBranchEEGModel',
-        edge_index_t, edge_weights_t
-    )
+    # Check if DualBranchEEGModel already exists
+    model_name = 'DualBranchEEGModel'
+    found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
+    if found:
+        print(f"✅ Found existing {model_name} in {source_dir}")
+        print(f"   Skipping training. Model will be copied to current results directory.")
+        copy_model_to_current_dir(existing_path, model_name, source_dir)
+        # Load the model to get validation results if available
+        try:
+            checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
+            if os.path.exists(checkpoint_path):
+                checkpoint = torch.load(checkpoint_path, map_location='cpu')
+                best_rmse = checkpoint.get('best_rmse', None)
+                best_epoch = checkpoint.get('best_epoch', None)
+                val_history = checkpoint.get('val_history', {})
+                if best_rmse is not None:
+                    results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
+                    print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+                else:
+                    results[model_name] = (None, None, {}, {})
+            else:
+                results[model_name] = (None, None, {}, {})
+        except Exception as e:
+            print(f"   ⚠️  Could not load checkpoint: {e}")
+            results[model_name] = (None, None, {}, {})
+    else:
+        dualbranch_model = DualBranchEEGModel(
+            n_channels=128, n_times=n_times, dropout=0.3, use_gat=False
+        )
+        results['DualBranchEEGModel'] = train_gnn_model(
+            dualbranch_model, train_loader, val_loader, 'DualBranchEEGModel',
+            edge_index_t, edge_weights_t
+        )
 
 # Domain Adaptation Models
 print("\n--- Domain Adaptation Models ---")
@@ -1562,39 +1757,413 @@ with torch.no_grad():
     except:
         feature_dim = 64
 
-dann_model = DANN(n_chans=n_chans, n_times=n_times, n_domains=n_domains, feature_dim=feature_dim)
-results['DANN'] = train_neural_network(
-    dann_model, train_loader, val_loader, 'DANN', return_domain=False
-)
+# DANN
+model_name = 'DANN'
+found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
+if found:
+    print(f"✅ Found existing {model_name} in {source_dir}")
+    print(f"   Skipping training. Model will be copied to current results directory.")
+    copy_model_to_current_dir(existing_path, model_name, source_dir)
+    try:
+        checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
+        if os.path.exists(checkpoint_path):
+            checkpoint = torch.load(checkpoint_path, map_location='cpu')
+            best_rmse = checkpoint.get('best_rmse', None)
+            best_epoch = checkpoint.get('best_epoch', None)
+            val_history = checkpoint.get('val_history', {})
+            if best_rmse is not None:
+                results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
+                print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+            else:
+                results[model_name] = (None, None, {}, {})
+        else:
+            results[model_name] = (None, None, {}, {})
+    except Exception as e:
+        print(f"   ⚠️  Could not load checkpoint: {e}")
+        results[model_name] = (None, None, {}, {})
+else:
+    dann_model = DANN(n_chans=n_chans, n_times=n_times, n_domains=n_domains, feature_dim=feature_dim)
+    results['DANN'] = train_neural_network(
+        dann_model, train_loader, val_loader, 'DANN', return_domain=False
+    )
 
-dannmodel_model = DANNModel(n_chans=n_chans, n_times=n_times, n_domains=n_domains)
-results['DANNModel'] = train_neural_network(
-    dannmodel_model, train_loader, val_loader, 'DANNModel', return_domain=False
-)
+# DANNModel
+model_name = 'DANNModel'
+found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
+if found:
+    print(f"✅ Found existing {model_name} in {source_dir}")
+    print(f"   Skipping training. Model will be copied to current results directory.")
+    copy_model_to_current_dir(existing_path, model_name, source_dir)
+    try:
+        checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
+        if os.path.exists(checkpoint_path):
+            checkpoint = torch.load(checkpoint_path, map_location='cpu')
+            best_rmse = checkpoint.get('best_rmse', None)
+            best_epoch = checkpoint.get('best_epoch', None)
+            val_history = checkpoint.get('val_history', {})
+            if best_rmse is not None:
+                results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
+                print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+            else:
+                results[model_name] = (None, None, {}, {})
+        else:
+            results[model_name] = (None, None, {}, {})
+    except Exception as e:
+        print(f"   ⚠️  Could not load checkpoint: {e}")
+        results[model_name] = (None, None, {}, {})
+else:
+    dannmodel_model = DANNModel(n_chans=n_chans, n_times=n_times, n_domains=n_domains)
+    results['DANNModel'] = train_neural_network(
+        dannmodel_model, train_loader, val_loader, 'DANNModel', return_domain=False
+    )
 
-cnn_trans_dann_model = CNNTransformerDANN(
-    n_chans=n_chans, n_times=n_times, n_domains=n_domains, feature_dim=feature_dim
-)
-results['CNNTransformerDANN'] = train_neural_network(
-    cnn_trans_dann_model, train_loader, val_loader, 'CNNTransformerDANN', return_domain=False
-)
+# CNNTransformerDANN
+model_name = 'CNNTransformerDANN'
+found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
+if found:
+    print(f"✅ Found existing {model_name} in {source_dir}")
+    print(f"   Skipping training. Model will be copied to current results directory.")
+    copy_model_to_current_dir(existing_path, model_name, source_dir)
+    try:
+        checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
+        if os.path.exists(checkpoint_path):
+            checkpoint = torch.load(checkpoint_path, map_location='cpu')
+            best_rmse = checkpoint.get('best_rmse', None)
+            best_epoch = checkpoint.get('best_epoch', None)
+            val_history = checkpoint.get('val_history', {})
+            if best_rmse is not None:
+                results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
+                print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+            else:
+                results[model_name] = (None, None, {}, {})
+        else:
+            results[model_name] = (None, None, {}, {})
+    except Exception as e:
+        print(f"   ⚠️  Could not load checkpoint: {e}")
+        results[model_name] = (None, None, {}, {})
+else:
+    cnn_trans_dann_model = CNNTransformerDANN(
+        n_chans=n_chans, n_times=n_times, n_domains=n_domains, feature_dim=feature_dim
+    )
+    results['CNNTransformerDANN'] = train_neural_network(
+        cnn_trans_dann_model, train_loader, val_loader, 'CNNTransformerDANN', return_domain=False
+    )
 
 # Labram Model
 print("\n--- Labram Model ---")
-try:
-    labram_model = Labram(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
-    results['Labram'] = train_neural_network(
-        labram_model, train_loader, val_loader, 'Labram'
-    )
-except Exception as e:
-    print(f"⚠️  Could not train Labram: {e}")
+model_name = 'Labram'
+found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
+if found:
+    print(f"✅ Found existing {model_name} in {source_dir}")
+    print(f"   Skipping training. Model will be copied to current results directory.")
+    copy_model_to_current_dir(existing_path, model_name, source_dir)
+    try:
+        checkpoint_path = os.path.join(source_dir, f"{model_name}_checkpoint.pt")
+        if os.path.exists(checkpoint_path):
+            checkpoint = torch.load(checkpoint_path, map_location='cpu')
+            best_rmse = checkpoint.get('best_rmse', None)
+            best_epoch = checkpoint.get('best_epoch', None)
+            val_history = checkpoint.get('val_history', {})
+            if best_rmse is not None:
+                results[model_name] = (best_rmse, best_epoch, checkpoint.get('train_history', {}), val_history)
+                print(f"   Validation RMSE: {best_rmse:.4f} (from epoch {best_epoch})")
+            else:
+                results[model_name] = (None, None, {}, {})
+        else:
+            results[model_name] = (None, None, {}, {})
+    except Exception as e:
+        print(f"   ⚠️  Could not load checkpoint: {e}")
+        results[model_name] = (None, None, {}, {})
+else:
+    try:
+        labram_model = Labram(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ)
+        results['Labram'] = train_neural_network(
+            labram_model, train_loader, val_loader, 'Labram'
+        )
+    except Exception as e:
+        print(f"⚠️  Could not train Labram: {e}")
 
 # ============================================================
-# 6. FINAL TESTING ON RELEASE 11
+# 5.5. HELPER FUNCTION TO CHECK FOR EXISTING MODELS
+# ============================================================
+def find_existing_model(model_name, result_dirs):
+    """
+    Check if a model already exists in any of the previous result directories.
+    
+    Returns:
+        tuple: (found, model_path, source_dir) where:
+            - found: bool, whether model was found
+            - model_path: str, path to the model file if found, None otherwise
+            - source_dir: str, directory where model was found, None otherwise
+    """
+    for result_dir in result_dirs:
+        if not os.path.exists(result_dir):
+            continue
+        model_path = os.path.join(result_dir, f"{model_name}_best.pt")
+        if os.path.exists(model_path):
+            return True, model_path, result_dir
+    return False, None, None
+
+
+def copy_model_to_current_dir(model_path, model_name, source_dir):
+    """Copy an existing model to the current results directory"""
+    import shutil
+    dest_path = os.path.join(RESULTS_DIR, f"{model_name}_best.pt")
+    try:
+        shutil.copy2(model_path, dest_path)
+        print(f"  📋 Copied model from {source_dir} to current results directory")
+        return dest_path
+    except Exception as e:
+        print(f"  ⚠️  Warning: Could not copy model: {e}")
+        return model_path  # Return original path if copy fails
+
+def test_all_models_from_directories(result_dirs, test_loader, n_chans, n_times, n_domains=None, feature_dim=None):
+    """Test all models found in the specified result directories"""
+    if test_loader is None:
+        print("⚠️  No test loader available. Skipping model testing from previous runs.")
+        return {}
+    
+    print("\n" + "=" * 70)
+    print("TESTING ALL MODELS FROM PREVIOUS RUNS")
+    print("=" * 70)
+    
+    # Model constructors (same as in main test section)
+    neural_network_models = {
+        'CNN1D': lambda: CNN1D(n_chans=n_chans, n_times=n_times),
+        'SimpleEEGNet': lambda: SimpleEEGNet(n_chans=n_chans, n_times=n_times),
+        'EEGNet_Custom': lambda: EEGNet(n_chans=n_chans, n_times=n_times),
+        'CNN_only': lambda: CNNOnly(n_chans=n_chans, n_times=n_times),
+        'EEGNeX_Custom': lambda: EEGNeX_Custom(n_chans=n_chans, n_times=n_times),
+        'EEGNeX_Braindecode': lambda: EEGNeX(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ),
+        'EEGMiner': lambda: EEGMiner(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ),
+        'Deep4Net': lambda: Deep4Net(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ),
+        'ATCNet': lambda: ATCNet(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ),
+        'SimpleEEGConformer': lambda: SimpleEEGConformer(n_chans=n_chans, n_times=n_times),
+        'EEGConformer': lambda: EEGConformer(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ),
+        'CNN_Transformer': lambda: CNNTransformer(n_chans=n_chans, n_times=n_times, dropout=0.3),
+        'HybridEEGRegressor': lambda: HybridEEGRegressor(n_chans=n_chans, n_times=n_times, dropout=0.3),
+        'DANN': lambda: DANN(n_chans=n_chans, n_times=n_times, n_domains=n_domains, feature_dim=feature_dim) if n_domains and feature_dim else None,
+        'DANNModel': lambda: DANNModel(n_chans=n_chans, n_times=n_times, n_domains=n_domains) if n_domains else None,
+        'CNNTransformerDANN': lambda: CNNTransformerDANN(n_chans=n_chans, n_times=n_times, n_domains=n_domains, feature_dim=feature_dim) if n_domains and feature_dim else None,
+        'Labram': lambda: Labram(n_chans=n_chans, n_times=n_times, n_outputs=1, sfreq=SFREQ),
+    }
+    
+    all_test_results = {}  # {model_name: {dir_name: results}}
+    models_found = set()
+    
+    # Scan all directories
+    for result_dir in result_dirs:
+        if not os.path.exists(result_dir):
+            print(f"⚠️  Directory not found: {result_dir}")
+            continue
+        
+        print(f"\n📁 Scanning {result_dir}...")
+        dir_results = {}
+        
+        # Find all _best.pt files
+        pt_files = list(Path(result_dir).glob("*_best.pt"))
+        if not pt_files:
+            print(f"   No model files found in {result_dir}")
+            continue
+        
+        print(f"   Found {len(pt_files)} model file(s)")
+        
+        for model_path in pt_files:
+            model_name = model_path.stem.replace("_best", "")
+            
+            if model_name not in neural_network_models:
+                # Try GNN model
+                if model_name == "DualBranchEEGModel" and HAS_PYG:
+                    try:
+                        model = DualBranchEEGModel(n_channels=128, n_times=n_times, dropout=0.3, use_gat=False)
+                        model.load_state_dict(torch.load(model_path, map_location=DEVICE))
+                        model = model.to(DEVICE)
+                        model.eval()
+                        
+                        # Need to build graph if not already available
+                        if 'edge_index_t' not in globals() and 'edge_index_t' not in locals():
+                            print("   🔧 Building functional connectivity graph for GNN...")
+                            sample_data = []
+                            for i in range(min(2000, len(train_windows))):
+                                X = train_windows[i][0]
+                                if isinstance(X, torch.Tensor):
+                                    X = X.numpy()
+                                sample_data.append(X)
+                            sample_data = np.stack(sample_data, axis=0)
+                            edge_index_np, edge_weights_np = build_functional_connectivity_graph(sample_data, threshold=0.3)
+                            edge_index_t = torch.from_numpy(edge_index_np).long().to(DEVICE)
+                            edge_weights_t = torch.from_numpy(edge_weights_np).float().to(DEVICE) if edge_weights_np is not None else None
+                        elif 'edge_index_t' in globals():
+                            # Use the global edge_index_t if it exists
+                            pass
+                        
+                        test_preds = []
+                        test_targets = []
+                        
+                        with torch.no_grad():
+                            for batch in test_loader:
+                                X, y, _ = batch[0], batch[1], batch[2] if len(batch) > 2 else None
+                                X = X.to(DEVICE).float()
+                                y = y.to(DEVICE).float().view(-1)
+                                pred = model(X, edge_index_t, edge_weights_t).view(-1)
+                                test_preds.append(pred.cpu().numpy())
+                                test_targets.append(y.cpu().numpy())
+                        
+                        test_preds = np.concatenate(test_preds)
+                        test_targets = np.concatenate(test_targets)
+                        test_rmse = np.sqrt(np.mean((test_preds - test_targets) ** 2))
+                        test_nrmse = test_rmse / (np.mean(np.abs(test_targets)) + 1e-8)
+                        test_errors = test_preds - test_targets
+                        error_stats = analyze_error_distribution(
+                            test_errors, f"{model_name}_test_{result_dir}", RESULTS_DIR
+                        )
+                        
+                        dir_results[model_name] = {
+                            'rmse': test_rmse,
+                            'nrmse': test_nrmse,
+                            'error_stats': error_stats,
+                            'source_dir': result_dir
+                        }
+                        models_found.add(model_name)
+                        print(f"   ✅ {model_name}: RMSE={test_rmse:.4f}, NRMSE={test_nrmse:.4f}")
+                    except Exception as e:
+                        print(f"   ❌ Error testing {model_name}: {e}")
+                    continue
+                else:
+                    print(f"   ⚠️  Unknown model: {model_name}, skipping")
+                    continue
+            
+            # Get model constructor
+            model_constructor = neural_network_models[model_name]
+            # Check if constructor requires parameters that might not be available
+            if model_name in ['DANN', 'DANNModel', 'CNNTransformerDANN']:
+                if n_domains is None or (model_name in ['DANN', 'CNNTransformerDANN'] and feature_dim is None):
+                    print(f"   ⚠️  Cannot construct {model_name} (missing n_domains/feature_dim), skipping")
+                    continue
+            
+            try:
+                print(f"   🧪 Testing {model_name}...")
+                model = model_constructor()
+                model.load_state_dict(torch.load(model_path, map_location=DEVICE))
+                model = model.to(DEVICE)
+                model.eval()
+                
+                test_preds = []
+                test_targets = []
+                
+                with torch.no_grad():
+                    for batch in test_loader:
+                        X, y, _ = batch[0], batch[1], batch[2] if len(batch) > 2 else None
+                        X = X.to(DEVICE).float()
+                        y = y.to(DEVICE).float().view(-1)
+                        
+                        # Handle models with special forward signatures
+                        if model_name in ['DANN', 'DANNModel', 'CNNTransformerDANN']:
+                            pred = model(X, return_domain=False).view(-1)
+                        else:
+                            pred = model(X).view(-1)
+                        
+                        test_preds.append(pred.cpu().numpy())
+                        test_targets.append(y.cpu().numpy())
+                
+                test_preds = np.concatenate(test_preds)
+                test_targets = np.concatenate(test_targets)
+                test_rmse = np.sqrt(np.mean((test_preds - test_targets) ** 2))
+                test_nrmse = test_rmse / (np.mean(np.abs(test_targets)) + 1e-8)
+                
+                # Error distribution analysis
+                test_errors = test_preds - test_targets
+                error_stats = analyze_error_distribution(
+                    test_errors, f"{model_name}_test_{result_dir}", RESULTS_DIR
+                )
+                
+                dir_results[model_name] = {
+                    'rmse': test_rmse,
+                    'nrmse': test_nrmse,
+                    'error_stats': error_stats,
+                    'source_dir': result_dir
+                }
+                models_found.add(model_name)
+                print(f"      ✅ RMSE={test_rmse:.4f}, NRMSE={test_nrmse:.4f}, MAE={error_stats['mae']:.4f}")
+                
+            except Exception as e:
+                print(f"      ❌ Error testing {model_name}: {e}")
+                import traceback
+                traceback.print_exc()
+        
+        if dir_results:
+            all_test_results[result_dir] = dir_results
+    
+    # Print summary
+    print("\n" + "=" * 70)
+    print("SUMMARY OF ALL TESTED MODELS")
+    print("=" * 70)
+    
+    # Group by model name
+    model_summary = defaultdict(list)
+    for dir_name, dir_results in all_test_results.items():
+        for model_name, results in dir_results.items():
+            model_summary[model_name].append((dir_name, results))
+    
+    for model_name in sorted(model_summary.keys()):
+        print(f"\n{model_name}:")
+        results_list = model_summary[model_name]
+        results_list.sort(key=lambda x: x[1]['rmse'])  # Sort by RMSE
+        
+        for dir_name, results in results_list:
+            print(f"  {dir_name:50s}: RMSE={results['rmse']:.4f} | NRMSE={results['nrmse']:.4f} | MAE={results['error_stats']['mae']:.4f}")
+        
+        # Best result
+        best_dir, best_results = results_list[0]
+        print(f"  {'BEST:':50s}: RMSE={best_results['rmse']:.4f} | NRMSE={best_results['nrmse']:.4f} | MAE={best_results['error_stats']['mae']:.4f} (from {best_dir})")
+    
+    # Save comprehensive results
+    summary_path = os.path.join(RESULTS_DIR, "all_previous_runs_test_results.json")
+    with open(summary_path, 'w') as f:
+        json.dump(all_test_results, f, indent=2)
+    print(f"\n✅ All test results saved to: {summary_path}")
+    
+    return all_test_results
+
+# Run the function to test all models from previous runs
+if test_loader is not None:
+    # Ensure n_domains and feature_dim are defined (needed for DANN models)
+    if 'n_domains' not in locals() or n_domains is None:
+        try:
+            unique_subjects = train_windows.get_metadata()["subject"].unique()
+            n_domains = len(unique_subjects)
+        except:
+            n_domains = 10  # Default fallback
+    
+    if 'feature_dim' not in locals() or feature_dim is None:
+        try:
+            temp_model = EEGNetv4(n_chans=n_chans, n_times=n_times, n_outputs=1)
+            with torch.no_grad():
+                dummy_input = torch.randn(1, n_chans, n_times)
+                if hasattr(temp_model, 'classifier'):
+                    original_classifier = temp_model.classifier
+                    temp_model.classifier = nn.Identity()
+                    feat_output = temp_model(dummy_input)
+                    feature_dim = feat_output.shape[1]
+                    temp_model.classifier = original_classifier
+                else:
+                    feature_dim = 64
+        except:
+            feature_dim = 64  # Default fallback
+    
+    previous_runs_results = test_all_models_from_directories(
+        PREVIOUS_RESULT_DIRS, test_loader, n_chans, n_times, n_domains, feature_dim
+    )
+
+# ============================================================
+# 7. FINAL TESTING ON RELEASE 11 (CURRENT RUN)
 # ============================================================
 if test_loader is not None:
     print("\n" + "=" * 70)
     print("FINAL TESTING ON RELEASE 11")
+    print("=" * 70)
+    print("NOTE: Testing all models including those from previous runs")
+    print("      (will check current directory first, then previous directories)")
     print("=" * 70)
     
     test_results = {}
@@ -1621,54 +2190,112 @@ if test_loader is not None:
     }
     
     for model_name, model_constructor in neural_network_models.items():
+        # Check if model exists in current directory first
         model_path = os.path.join(RESULTS_DIR, f"{model_name}_best.pt")
-        if os.path.exists(model_path):
+        
+        # If not in current directory, check previous directories
+        if not os.path.exists(model_path):
+            found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
+            if found:
+                model_path = existing_path
+                print(f"\n🧪 Testing {model_name} (from {source_dir})...")
+            else:
+                # Model doesn't exist anywhere, skip
+                continue
+        else:
             print(f"\n🧪 Testing {model_name}...")
-            try:
-                model = model_constructor()
-                model.load_state_dict(torch.load(model_path, map_location=DEVICE))
-                model = model.to(DEVICE)
-                model.eval()
-                
-                test_preds = []
-                test_targets = []
-                
-                with torch.no_grad():
-                    for batch in test_loader:
-                        X, y, _ = batch[0], batch[1], batch[2] if len(batch) > 2 else None
-                        X = X.to(DEVICE).float()
-                        y = y.to(DEVICE).float().view(-1)
-                        
-                        # Handle models with special forward signatures
-                        if model_name in ['DANN', 'DANNModel', 'CNNTransformerDANN']:
-                            pred = model(X, return_domain=False).view(-1)
-                        elif model_name == 'DualBranchEEGModel' and HAS_PYG:
-                            pred = model(X, edge_index_t, edge_weights_t).view(-1)
-                        else:
-                            pred = model(X).view(-1)
-                        
-                        test_preds.append(pred.cpu().numpy())
-                        test_targets.append(y.cpu().numpy())
-                
-                test_preds = np.concatenate(test_preds)
-                test_targets = np.concatenate(test_targets)
-                test_rmse = np.sqrt(np.mean((test_preds - test_targets) ** 2))
-                test_nrmse = test_rmse / (np.mean(np.abs(test_targets)) + 1e-8)
-                test_results[model_name] = {'rmse': test_rmse, 'nrmse': test_nrmse}
-                print(f"  ✅ Test RMSE: {test_rmse:.4f} | Test NRMSE: {test_nrmse:.4f}")
-                
-                # Error distribution analysis
-                test_errors = test_preds - test_targets
-                analyze_error_distribution(test_errors, f"{model_name}_test", RESULTS_DIR)
-            except Exception as e:
-                print(f"  ❌ Error testing {model_name}: {e}")
+        
+        try:
+            # Check if constructor requires parameters that might not be available
+            if model_name in ['DANN', 'DANNModel', 'CNNTransformerDANN']:
+                if n_domains is None or (model_name in ['DANN', 'CNNTransformerDANN'] and feature_dim is None):
+                    print(f"  ⚠️  Cannot construct {model_name} (missing n_domains/feature_dim), skipping")
+                    continue
+            
+            model = model_constructor()
+            model.load_state_dict(torch.load(model_path, map_location=DEVICE))
+            model = model.to(DEVICE)
+            model.eval()
+            
+            test_preds = []
+            test_targets = []
+            
+            with torch.no_grad():
+                for batch in test_loader:
+                    X, y, _ = batch[0], batch[1], batch[2] if len(batch) > 2 else None
+                    X = X.to(DEVICE).float()
+                    y = y.to(DEVICE).float().view(-1)
+                    
+                    # Handle models with special forward signatures
+                    if model_name in ['DANN', 'DANNModel', 'CNNTransformerDANN']:
+                        pred = model(X, return_domain=False).view(-1)
+                    elif model_name == 'DualBranchEEGModel' and HAS_PYG:
+                        pred = model(X, edge_index_t, edge_weights_t).view(-1)
+                    else:
+                        pred = model(X).view(-1)
+                    
+                    test_preds.append(pred.cpu().numpy())
+                    test_targets.append(y.cpu().numpy())
+            
+            test_preds = np.concatenate(test_preds)
+            test_targets = np.concatenate(test_targets)
+            test_rmse = np.sqrt(np.mean((test_preds - test_targets) ** 2))
+            test_nrmse = test_rmse / (np.mean(np.abs(test_targets)) + 1e-8)
+            
+            # Error distribution analysis
+            test_errors = test_preds - test_targets
+            error_stats = analyze_error_distribution(test_errors, f"{model_name}_test", RESULTS_DIR)
+            
+            # Store comprehensive test results including error statistics
+            test_results[model_name] = {
+                'rmse': test_rmse,
+                'nrmse': test_nrmse,
+                'error_stats': error_stats,
+                'source': 'current' if os.path.exists(os.path.join(RESULTS_DIR, f"{model_name}_best.pt")) else source_dir
+            }
+            print(f"  ✅ Test RMSE: {test_rmse:.4f} | Test NRMSE: {test_nrmse:.4f}")
+            print(f"     MAE: {error_stats['mae']:.4f} | Mean Error: {error_stats['mean']:.4f} | Std Error: {error_stats['std']:.4f}")
+            print(f"     Median: {error_stats['median']:.4f} | Q25: {error_stats['q25']:.4f} | Q75: {error_stats['q75']:.4f}")
+        except Exception as e:
+            print(f"  ❌ Error testing {model_name}: {e}")
+            import traceback
+            traceback.print_exc()
     
     # Test GNN models separately if available
     if HAS_PYG:
-        gnn_model_path = os.path.join(RESULTS_DIR, "DualBranchEEGModel_best.pt")
-        if os.path.exists(gnn_model_path):
-            print(f"\n🧪 Testing DualBranchEEGModel...")
+        model_name = 'DualBranchEEGModel'
+        gnn_model_path = os.path.join(RESULTS_DIR, f"{model_name}_best.pt")
+        
+        # If not in current directory, check previous directories
+        if not os.path.exists(gnn_model_path):
+            found, existing_path, source_dir = find_existing_model(model_name, PREVIOUS_RESULT_DIRS)
+            if found:
+                gnn_model_path = existing_path
+                print(f"\n🧪 Testing {model_name} (from {source_dir})...")
+            else:
+                # Model doesn't exist anywhere, skip
+                gnn_model_path = None
+        
+        if gnn_model_path and os.path.exists(gnn_model_path):
+            if 'gnn_model_path' in locals() and gnn_model_path != os.path.join(RESULTS_DIR, f"{model_name}_best.pt"):
+                print(f"\n🧪 Testing {model_name} (from previous run)...")
+            else:
+                print(f"\n🧪 Testing {model_name}...")
             try:
+                # Ensure graph structure is available
+                if 'edge_index_t' not in globals():
+                    print("   🔧 Building functional connectivity graph for GNN...")
+                    sample_data = []
+                    for i in range(min(2000, len(train_windows))):
+                        X = train_windows[i][0]
+                        if isinstance(X, torch.Tensor):
+                            X = X.numpy()
+                        sample_data.append(X)
+                    sample_data = np.stack(sample_data, axis=0)
+                    edge_index_np, edge_weights_np = build_functional_connectivity_graph(sample_data, threshold=0.3)
+                    edge_index_t = torch.from_numpy(edge_index_np).long().to(DEVICE)
+                    edge_weights_t = torch.from_numpy(edge_weights_np).float().to(DEVICE) if edge_weights_np is not None else None
+                
                 model = DualBranchEEGModel(n_channels=128, n_times=n_times, dropout=0.3, use_gat=False)
                 model.load_state_dict(torch.load(gnn_model_path, map_location=DEVICE))
                 model = model.to(DEVICE)
@@ -1690,14 +2317,25 @@ if test_loader is not None:
                 test_targets = np.concatenate(test_targets)
                 test_rmse = np.sqrt(np.mean((test_preds - test_targets) ** 2))
                 test_nrmse = test_rmse / (np.mean(np.abs(test_targets)) + 1e-8)
-                test_results['DualBranchEEGModel'] = {'rmse': test_rmse, 'nrmse': test_nrmse}
-                print(f"  ✅ Test RMSE: {test_rmse:.4f} | Test NRMSE: {test_nrmse:.4f}")
                 
                 # Error distribution analysis
                 test_errors = test_preds - test_targets
-                analyze_error_distribution(test_errors, "DualBranchEEGModel_test", RESULTS_DIR)
+                error_stats = analyze_error_distribution(test_errors, f"{model_name}_test", RESULTS_DIR)
+                
+                # Store comprehensive test results including error statistics
+                test_results[model_name] = {
+                    'rmse': test_rmse,
+                    'nrmse': test_nrmse,
+                    'error_stats': error_stats,
+                    'source': 'current' if os.path.exists(os.path.join(RESULTS_DIR, f"{model_name}_best.pt")) else source_dir
+                }
+                print(f"  ✅ Test RMSE: {test_rmse:.4f} | Test NRMSE: {test_nrmse:.4f}")
+                print(f"     MAE: {error_stats['mae']:.4f} | Mean Error: {error_stats['mean']:.4f} | Std Error: {error_stats['std']:.4f}")
+                print(f"     Median: {error_stats['median']:.4f} | Q25: {error_stats['q25']:.4f} | Q75: {error_stats['q75']:.4f}")
             except Exception as e:
-                print(f"  ❌ Error testing DualBranchEEGModel: {e}")
+                print(f"  ❌ Error testing {model_name}: {e}")
+                import traceback
+                traceback.print_exc()
     
     # Test linear/tree models
     for model_name in ['LinearRegression', 'Ridge', 'Lasso', 'RandomForest']:
@@ -1715,12 +2353,19 @@ if test_loader is not None:
             test_pred = model.predict(X_test_scaled)
             test_rmse = np.sqrt(np.mean((test_pred - y_test) ** 2))
             test_nrmse = test_rmse / (np.mean(np.abs(y_test)) + 1e-8)
-            test_results[model_name] = {'rmse': test_rmse, 'nrmse': test_nrmse}
-            print(f"  ✅ Test RMSE: {test_rmse:.4f} | Test NRMSE: {test_nrmse:.4f}")
             
             # Error distribution analysis
             test_errors = test_pred - y_test
-            analyze_error_distribution(test_errors, f"{model_name}_test", RESULTS_DIR)
+            error_stats = analyze_error_distribution(test_errors, f"{model_name}_test", RESULTS_DIR)
+            
+            # Store comprehensive test results including error statistics
+            test_results[model_name] = {
+                'rmse': test_rmse,
+                'nrmse': test_nrmse,
+                'error_stats': error_stats
+            }
+            print(f"  ✅ Test RMSE: {test_rmse:.4f} | Test NRMSE: {test_nrmse:.4f}")
+            print(f"     MAE: {error_stats['mae']:.4f} | Mean Error: {error_stats['mean']:.4f} | Std Error: {error_stats['std']:.4f}")
     
     if HAS_XGB:
         model_path = os.path.join(RESULTS_DIR, "XGBoost_model.pkl")
@@ -1732,12 +2377,19 @@ if test_loader is not None:
             test_pred = model.predict(X_test_scaled)
             test_rmse = np.sqrt(np.mean((test_pred - y_test) ** 2))
             test_nrmse = test_rmse / (np.mean(np.abs(y_test)) + 1e-8)
-            test_results['XGBoost'] = {'rmse': test_rmse, 'nrmse': test_nrmse}
-            print(f"  ✅ Test RMSE: {test_rmse:.4f} | Test NRMSE: {test_nrmse:.4f}")
             
             # Error distribution analysis
             test_errors = test_pred - y_test
-            analyze_error_distribution(test_errors, "XGBoost_test", RESULTS_DIR)
+            error_stats = analyze_error_distribution(test_errors, "XGBoost_test", RESULTS_DIR)
+            
+            # Store comprehensive test results including error statistics
+            test_results['XGBoost'] = {
+                'rmse': test_rmse,
+                'nrmse': test_nrmse,
+                'error_stats': error_stats
+            }
+            print(f"  ✅ Test RMSE: {test_rmse:.4f} | Test NRMSE: {test_nrmse:.4f}")
+            print(f"     MAE: {error_stats['mae']:.4f} | Mean Error: {error_stats['mean']:.4f} | Std Error: {error_stats['std']:.4f}")
 
 # ============================================================
 # 7. SAVE RESULTS SUMMARY
@@ -1805,6 +2457,11 @@ if 'test_results' in summary and summary['test_results']:
     for model_name, test_result in summary['test_results'].items():
         if isinstance(test_result, dict):
             print(f"  {model_name:20s}: RMSE = {test_result['rmse']:.4f} | NRMSE = {test_result['nrmse']:.4f}")
+            # Print error statistics if available
+            if 'error_stats' in test_result:
+                err_stats = test_result['error_stats']
+                print(f"     {'':20s}  MAE = {err_stats['mae']:.4f} | Mean Error = {err_stats['mean']:.4f} | Std Error = {err_stats['std']:.4f}")
+                print(f"     {'':20s}  Median = {err_stats['median']:.4f} | Q25 = {err_stats['q25']:.4f} | Q75 = {err_stats['q75']:.4f}")
         else:
             print(f"  {model_name:20s}: RMSE = {test_result:.4f}")
 
