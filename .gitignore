@@ -1,13 +1,13 @@
 /local_directory
 
 # Model weight files (too large for GitHub)
-*.pt
+# *.pt
 *.pth
 *.joblib
 *.pkl
 
 # Large data files
-*.npy
+# *.npy
 *.npz
 
 # Python cache
@@ -29,3 +29,4 @@ data/
 eeg_cache/
 scoring_results/
 test_results/
+data_merged/
